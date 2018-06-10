@@ -42,27 +42,6 @@ print ("label", input_shape_label)
 
 model_input = Input(shape=input_shape_train)
 
-#First model: ConvPool-CNN-C
-def conv_pool_cnn(model_input):
-    x = Conv2D(96, kernel_size=(3, 3), activation='relu', padding='same')(model_input)
-    x = Conv2D(96, (3, 3), activation='relu', padding='same')(x)
-    x = Conv2D(96, (3, 3), activation='relu', padding='same')(x)
-    x = MaxPooling2D(pool_size=(3, 3))(x)
-    x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
-    x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
-    x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
-    x = MaxPooling2D(pool_size=(3, 3), strides=2)(x)
-    x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
-    x = Conv2D(192, (1, 1), activation='relu')(x)
-    x = Conv2D(10, (1, 1))(x)
-    x = GlobalAveragePooling2D()(x)
-    x = Activation(activation='softmax')(x)
-
-    model = Model(model_input, x, name='conv_pool_cnn')
-
-    return model
-conv_pool_cnn_model = conv_pool_cnn(model_input)
-
 
 def compile_and_train(model, num_epochs):
     model.compile(loss=categorical_crossentropy, optimizer=Adam(), metrics=['acc'])
@@ -73,7 +52,6 @@ def compile_and_train(model, num_epochs):
     history = model.fit(x=x_train, y=y_train, batch_size=32,
                         epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board], validation_split=0.2)
     return history
-_ = compile_and_train(conv_pool_cnn_model, num_epochs=1)
 
 def evaluate_error(model):
     pred = model.predict(x_test, batch_size = 32)
@@ -81,4 +59,91 @@ def evaluate_error(model):
     pred = np.expand_dims(pred, axis=1) # make same shape as y_test
     error = np.sum(np.not_equal(pred, y_test)) / y_test.shape[0]
     return error
-print (evaluate_error(conv_pool_cnn_model))
+
+#First model: ConvPool-CNN-C
+def conv_pool_cnn(model_input):
+    x = Conv2D(96, kernel_size=(3, 3), activation='relu', padding='same')(model_input)
+    x = Conv2D(96, (3, 3), activation='relu', padding='same')(x)
+    #x = Conv2D(96, (3, 3), activation='relu', padding='same')(x)
+    x = MaxPooling2D(pool_size=(3, 3), strides=2)(x)
+    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    #x = MaxPooling2D(pool_size=(3, 3), strides=2)(x)
+    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    #x = Conv2D(192, (1, 1), activation='relu')(x)
+    x = Conv2D(10, (1, 1))(x)
+    x = GlobalAveragePooling2D()(x)
+    x = Activation(activation='softmax')(x)
+    model = Model(model_input, x, name='conv_pool_cnn')
+    return model
+conv_pool_cnn_model = conv_pool_cnn(model_input)
+_ = compile_and_train(conv_pool_cnn_model, num_epochs=5)
+evaluate_error(conv_pool_cnn_model)
+
+#Second model: ALL-CNN-C
+def all_cnn(model_input):
+    x = Conv2D(96, kernel_size=(3, 3), activation='relu', padding='same')(model_input)
+    x = Conv2D(96, (3, 3), activation='relu', padding='same')(x)
+    #x = Conv2D(96, (3, 3), activation='relu', padding='same')(x)
+    x = MaxPooling2D(pool_size=(3, 3), strides=2)(x)
+    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    #x = MaxPooling2D(pool_size=(3, 3), strides=2)(x)
+    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    #x = Conv2D(192, (1, 1), activation='relu')(x)
+    x = Conv2D(10, (1, 1))(x)
+    x = GlobalAveragePooling2D()(x)
+    x = Activation(activation='softmax')(x)
+    model = Model(model_input, x, name='all_cnn')
+    return model
+all_cnn_model = all_cnn(model_input)
+_ = compile_and_train(all_cnn_model,num_epochs=5)
+evaluate_error(all_cnn_model)
+
+
+#Third model: ALL-CNN-C
+def nin_cnn(model_input):
+    x = Conv2D(96, kernel_size=(3, 3), activation='relu', padding='same')(model_input)
+    x = Conv2D(96, (3, 3), activation='relu', padding='same')(x)
+    #x = Conv2D(96, (3, 3), activation='relu', padding='same')(x)
+    x = MaxPooling2D(pool_size=(3, 3), strides=2)(x)
+    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    #x = MaxPooling2D(pool_size=(3, 3), strides=2)(x)
+    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    #x = Conv2D(192, (1, 1), activation='relu')(x)
+    x = Conv2D(10, (1, 1))(x)
+    x = GlobalAveragePooling2D()(x)
+    x = Activation(activation='softmax')(x)
+    model = Model(model_input, x, name='nin_cnn')
+    return model
+nin_cnn_model = nin_cnn(model_input)
+_ = compile_and_train(nin_cnn_model,num_epochs=5)
+evaluate_error(nin_cnn_model)
+
+#ensemble model
+conv_pool_cnn_model = conv_pool_cnn(model_input)
+all_cnn_model = all_cnn(model_input)
+nin_cnn_model = nin_cnn(model_input)
+
+conv_pool_cnn_model.load_weights("weights/conv_pool_cnn.05-0.63.hdf5")
+all_cnn_model.load_weights("weights/all_cnn.05-0.72.hdf5")
+nin_cnn_model.load_weights('weights/nin_cnn.05-0.68.hdf5')
+
+models=[conv_pool_cnn_model,all_cnn_model,nin_cnn_model]
+
+def ensemble(models, model_input):
+
+    outputs = [model.outputs[0] for model in models]
+    y = Average()(outputs)
+
+    model = Model(model_input , y , name="ensemble")
+
+    return model
+
+ensemble_model = ensemble(models, model_input)
+evaluate_error(ensemble_model)
+
