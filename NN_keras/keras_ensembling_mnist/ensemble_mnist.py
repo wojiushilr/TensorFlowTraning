@@ -1,4 +1,4 @@
-#edit by LR 20180110
+#edit by LR 20180610
 from keras.models import Model, Input
 from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, Dropout, Activation, Average
 from keras.utils import to_categorical
