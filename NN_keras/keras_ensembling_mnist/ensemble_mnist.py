@@ -27,7 +27,7 @@ y_train = to_categorical(y_train, num_classes=10)
 x_train = x_train[:,:,:,np.newaxis]
 x_test = x_test[:,:,:,np.newaxis]
 y_test = y_test[:,np.newaxis]
-#The dataset consists of 60000 32x32 RGB images from 10 classes. 50000
+
 # images are used for training/validation and the other 10000 for testing
 print('x_train shape: {} | y_train shape: {}\nx_test shape : {} | y_test shape : {}'.format(
     x_train.shape, y_train.shape,x_test.shape, y_test.shape))
