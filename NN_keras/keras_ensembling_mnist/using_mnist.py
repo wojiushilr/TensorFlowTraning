@@ -1,4 +1,5 @@
 #edit by LR 20180110
+#tensorboard --logdir=/Users/rivaille/PycharmProjects/TensorFlowTraning/NN_keras/keras_ensemblng_pic/logs
 from keras.models import Model, Input
 from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, Dropout, Activation, Average
 from keras.utils import to_categorical
@@ -77,7 +78,9 @@ def conv_pool_cnn(model_input):
     x = Activation(activation='softmax')(x)
     model = Model(model_input, x, name='conv_pool_cnn')
     return model
-
+conv_pool_cnn_model = conv_pool_cnn(model_input)
+_ = compile_and_train(conv_pool_cnn_model, num_epochs=5)
+evaluate_error(conv_pool_cnn_model)
 
 #Second model: ALL-CNN-C
 def all_cnn(model_input):
@@ -96,7 +99,9 @@ def all_cnn(model_input):
     x = Activation(activation='softmax')(x)
     model = Model(model_input, x, name='all_cnn')
     return model
-
+all_cnn_model = all_cnn(model_input)
+_ = compile_and_train(all_cnn_model,num_epochs=5)
+evaluate_error(all_cnn_model)
 
 
 #Third model: ALL-CNN-C
@@ -116,7 +121,9 @@ def nin_cnn(model_input):
     x = Activation(activation='softmax')(x)
     model = Model(model_input, x, name='nin_cnn')
     return model
-
+nin_cnn_model = nin_cnn(model_input)
+_ = compile_and_train(nin_cnn_model,num_epochs=5)
+evaluate_error(nin_cnn_model)
 
 #ensemble model
 conv_pool_cnn_model = conv_pool_cnn(model_input)
@@ -139,5 +146,5 @@ def ensemble(models, model_input):
     return model
 
 ensemble_model = ensemble(models, model_input)
-_ = compile_and_train(ensemble_model,num_epochs=5)
 evaluate_error(ensemble_model)
+
