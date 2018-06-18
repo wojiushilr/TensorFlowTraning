@@ -77,5 +77,5 @@ def conv_pool_cnn(model_input):
     model = Model(model_input, x, name='all_cnn')
     return model
 conv_pool_cnn_model = conv_pool_cnn(model_input)
-_ = compile_and_train(conv_pool_cnn_model, num_epochs=5)
+_ = compile_and_train(conv_pool_cnn_model, num_epochs=20)
 evaluate_error(conv_pool_cnn_model)
