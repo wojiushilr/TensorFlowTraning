@@ -13,7 +13,7 @@ import os
 
 import numpy as np
 
-#
+##tensorboard --logdir=/Users/rivaille/PycharmProjects/TensorFlowTraning/NN_keras/keras_ensemblng_pic/logs
 os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
 
 gpu_options = tf.GPUOptions(allow_growth=True)

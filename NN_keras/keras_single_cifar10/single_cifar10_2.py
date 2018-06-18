@@ -64,5 +64,5 @@ def all_cnn(model_input):
 
     return model
 all_cnn_model = all_cnn(model_input)
-_ = compile_and_train(all_cnn_model, num_epochs=5)
+_ = compile_and_train(all_cnn_model, num_epochs=20)
 evaluate_error(all_cnn_model)
