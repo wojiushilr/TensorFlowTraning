@@ -116,7 +116,6 @@ all_cnn_model.load_weights("weights/all_cnn.30-0.08.hdf5")
 nin_cnn_model.load_weights('weights/nin_cnn.30-0.93.hdf5')
 
 models=[conv_pool_cnn_model,all_cnn_model,nin_cnn_model]
-
 def ensemble(models, model_input):
 
     outputs = [model.outputs[0] for model in models]
