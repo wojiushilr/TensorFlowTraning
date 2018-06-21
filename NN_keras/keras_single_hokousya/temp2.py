@@ -1,8 +1,4 @@
-#BY LR 20180621
-import matplotlib
-matplotlib.use("Agg")
-# import the necessary packages
-from sklearn.model_selection import train_test_split
+#edit by LR 20180110
 import tensorflow as tf
 from keras.models import Model, Input
 from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, Dropout, Activation, Average
@@ -17,90 +13,138 @@ import os
 from keras import backend as K
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
-from keras.preprocessing.image import img_to_array
-from keras.utils import to_categorical
-from imutils import paths
-import matplotlib.pyplot as plt
+
+
 import numpy as np
-import argparse
-import random
-import cv2
-import os
-import sys
-sys.path.append('..')
 
-def load_data(path):
-    print("[INFO] loading images...")
-    data = []
-    labels = []
-    # grab the image paths and randomly shuffle them
-    imagePaths = sorted(list(paths.list_images(path)))
-    #print('imagePaths',imagePaths)
-    random.seed(42)
-    random.shuffle(imagePaths)
-    # loop over the input images
-    for imagePath in imagePaths:
-        # load the image, pre-process it, and store it in the data list
-        image = cv2.imread(imagePath)
-        image = cv2.resize(image, (96, 64))
-        image = img_to_array(image)
-        data.append(image)
+##tensorboard --logdir=/Users/rivaille/PycharmProjects/TensorFlowTraning/NN_keras/keras_ensemblng_pic/logs
+os.environ["CUDA_VISIBLE_DEVICES"] = "0,1"
 
-        # extract the class label from the image path and update the
-        # labels list
-        label = int(imagePath.split(os.path.sep)[-2])
-        print('label',label)
-        labels.append(label)
+gpu_options = tf.GPUOptions(allow_growth=True)
 
-    # scale the raw pixel intensities to the range [0, 1]
-    data = np.array(data, dtype="float") / 255.0
-    labels = np.array(labels)
+sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 
-    # convert the labels from integers to vectors
-    labels = to_categorical(labels, num_classes=8)
-    return data,labels
-
-X_train,y_train = load_data('C:\\Users\\USER\Desktop\\feng_exp\\train')
-X_test,y_test = load_data('C:\\Users\\USER\Desktop\\feng_exp\\test')
+from tensorflow.python.client import device_lib
+print(device_lib.list_local_devices())
 
 
-print(X_train.shape)
+###
+img_width, img_height = 64, 96
+batch_size=32
+#train_data_dir = '/Users/rivaille/Desktop/dataset_new/feng_exp/train/dataset5'
+#validation_data_dir= '/Users/rivaille/Desktop/dataset_new/feng_exp/test/dataset1'
+
+train_data_dir = 'C:/Users/USER/Desktop/feng_exp/train/dataset5'
+validation_data_dir= 'C:/Users/USER/Desktop/feng_exp/test/dataset1'
+nb_train_samples = 1280
+nb_validation_samples = 320
+#data_format,tensorflow of theaon
+if K.image_data_format() == 'channels_first':
+    input_shape = (3, img_width, img_height)
+else:
+    input_shape = (img_width, img_height, 3)
+
+'''
+(x_train, y_train), (x_test, y_test) = cifar10.load_data()
+x_train = x_train / 255.
+x_test = x_test / 255.
+y_train = to_categorical(y_train, num_classes=10)
+'''
+
+
+#The dataset consists of 60000 32x32 RGB images from 10 classes. 50000
+# images are used for training/validation and the other 10000 for testing
+print(input_shape)
+print(type(train_data_dir))
+
+
+'''
+
+input_shape_train = x_train[0,:,:,:].shape
+input_shape_label = y_test[0:10,:]
+print ("input_shape", input_shape_train)
+print ("label", input_shape_label)
+'''
+
+train_datagen = ImageDataGenerator(rescale=1. / 255)
+
+# this is the augmentation configuration we will use for testing:
+# only rescaling
+test_datagen = ImageDataGenerator(rescale=1. / 255)
+
+train_generator = train_datagen.flow_from_directory(
+    train_data_dir,
+    target_size=(img_width, img_height),
+    batch_size=batch_size,
+    class_mode='categorical')
+
+validation_generator = test_datagen.flow_from_directory(
+    validation_data_dir,
+    target_size=(img_width, img_height),
+    batch_size=batch_size,
+    class_mode='categorical')
+
+print("validation_generator.class_indices:",type(validation_generator.class_indices),validation_generator.class_indices)
+
 
 #First model: ConvPool-CNN-C
-def model1_create():
 
-    model = Sequential()
-    model.add(Conv2D(32, (3, 3), input_shape=(64,96,3))) #3*3
-    model.add(Activation('relu'))
-    model.add(Conv2D(32, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(Conv2D(32, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))#2*2
+model1 = Sequential()
+model1.add(Conv2D(32, (3, 3), input_shape=input_shape)) #3*3
+model1.add(Activation('relu'))
+model1.add(Conv2D(32, (3, 3)))
+model1.add(Activation('relu'))
+model1.add(Conv2D(32, (3, 3)))
+model1.add(Activation('relu'))
+model1.add(MaxPooling2D(pool_size=(2, 2)))#2*2
 
-    model.add(Conv2D(64, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(Conv2D(64, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+model1.add(Conv2D(64, (3, 3)))
+model1.add(Activation('relu'))
+model1.add(Conv2D(64, (3, 3)))
+model1.add(Activation('relu'))
+model1.add(MaxPooling2D(pool_size=(2, 2)))
 
-    model.add(Flatten())
-    model.add(Dense(64))
-    model.add(Activation('relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(8))
-    model.add(Activation("sigmoid"))
-    return model
+model1.add(Flatten())
+model1.add(Dense(64))
+model1.add(Activation('relu'))
+model1.add(Dropout(0.5))
+model1.add(Dense(8))
+model1.add(Activation("sigmoid"))
+
+
+
+
 
 def compile_and_train(model, num_epochs):
-    model.compile(loss=categorical_crossentropy, optimizer=Adam(), metrics=['acc'])
+    model.compile(loss='categorical_crossentropy', optimizer=Adam(), metrics=['acc'])
     filepath = 'weights/' + model.name + '.{epoch:02d}-{loss:.2f}.hdf5'
     checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=0, save_weights_only=True,
                                  save_best_only=True, mode='auto', period=1)
     tensor_board = TensorBoard(log_dir='logs1/', histogram_freq=0, batch_size=32)
-    history = model.fit(x=X_train, y=y_train, batch_size=32,
-                        epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board], validation_split=0.2)
+    history = model1.fit_generator(train_generator,
+                                   steps_per_epoch=nb_train_samples // batch_size,
+                                   epochs=num_epochs,
+                                   validation_data=None,
+                                   #validation_steps=nb_validation_samples // batch_size,
+                                   callbacks=[checkpoint, tensor_board])
     return history
 
-model1 = model1_create()
+def evaluate_error(model):
+    pred = model.predict_generator(validation_generator)
+    #pred = np.argmax(pred, axis=1)
+    #pred = np.expand_dims(pred, axis=1) # make same shape as y_test
+    print('pred',pred)
+    print(type(pred))
+    print(pred.shape)
+    y_pre = to_categorical(pred, num_classes=10)
+    print(y_pre.shape)
+
 _ = compile_and_train(model1, num_epochs=20)
+evaluate_error(model1)
+
+scoreSeg = model1.evaluate_generator(validation_generator,nb_train_samples // batch_size//2)
+print("Accuracy = ",scoreSeg[1])
+
+
+#model1.save_weights('/Users/rivaille/PycharmProjects/TensorFlowTraning/NN_keras/keras_single_hokousya/weights/model1.h5')
+
