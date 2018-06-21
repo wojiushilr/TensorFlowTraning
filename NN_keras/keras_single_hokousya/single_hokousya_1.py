@@ -83,6 +83,7 @@ validation_generator = test_datagen.flow_from_directory(
 
 print("validation_generator.class_indices:",type(validation_generator.class_indices),validation_generator.class_indices)
 
+print(y_train)
 #First model: ConvPool-CNN-C
 
 model1 = Sequential()
@@ -105,7 +106,7 @@ model1.add(Dense(64))
 model1.add(Activation('relu'))
 model1.add(Dropout(0.5))
 model1.add(Dense(8))
-model1.add(Activation())
+model1.add(Activation("softmax"))
 
 
 
@@ -120,8 +121,8 @@ def compile_and_train(model, num_epochs):
     history = model1.fit_generator(train_generator,
                                    steps_per_epoch=nb_train_samples // batch_size,
                                    epochs=num_epochs,
-                                   validation_data=validation_generator,
-                                   validation_steps=nb_validation_samples // batch_size,
+                                   validation_data=None,
+                                   #validation_steps=nb_validation_samples // batch_size,
                                    callbacks=[checkpoint, tensor_board])
     return history
 
@@ -132,7 +133,8 @@ def evaluate_error(model):
     print('pred',pred)
     print(type(pred))
     print(pred.shape)
-    print()
+    y_pre = to_categorical(pred, num_classes=10)
+    print(y_pre)
 
 _ = compile_and_train(model1, num_epochs=1)
 evaluate_error(model1)
