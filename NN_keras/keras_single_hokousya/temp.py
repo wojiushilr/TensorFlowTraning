@@ -31,8 +31,8 @@ print(device_lib.list_local_devices())
 ###
 img_width, img_height = 64, 96
 batch_size=32
-train_data_dir = '/Users/rivaille/Desktop/dataset_new/feng_exp/train/dataset5'
-validation_data_dir= '/Users/rivaille/Desktop/dataset_new/feng_exp/test/dataset1'
+train_data_dir = 'C:\\Users\\USER\\Desktop\\feng_exp\\train\\dataset5'
+validation_data_dir= 'C:\\Users\\USER\\Desktop\\feng_exp\\test\\dataset1'
 nb_train_samples = 1280
 nb_validation_samples = 320
 #data_format,tensorflow of theaon
@@ -87,15 +87,15 @@ print("validation_generator.class_indices:",type(validation_generator.class_indi
 def conv_pool_cnn():
     input_img = Input(shape=(64,96,3))
     x = Conv2D(96, kernel_size=(3, 3), activation='relu', padding='same')(input_img)
-    #x = Conv2D(96, (3, 3), activation='relu', padding='same')(x)
+    x = Conv2D(96, (3, 3), activation='relu', padding='same')(x)
     x = Conv2D(96, (3, 3), activation='relu', padding='same')(x)
     x = MaxPooling2D(pool_size=(3, 3), strides=2)(x)
-    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
-    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
-    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
-    #x = MaxPooling2D(pool_size=(3, 3), strides=2)(x)
-    #x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
-    #x = Conv2D(192, (1, 1), activation='relu')(x)
+    x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    x = MaxPooling2D(pool_size=(3, 3), strides=2)(x)
+    x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
+    x = Conv2D(192, (1, 1), activation='relu')(x)
     x = Conv2D(8, (1, 1))(x)
     x = GlobalAveragePooling2D()(x)
     x = Activation(activation='softmax')(x)
@@ -128,8 +128,7 @@ def evaluate_error(model):
 
 #input_shape_train = x_train[0,:,:,:].shape
 conv_pool_cnn_model = conv_pool_cnn()
-_ = compile_and_train(conv_pool_cnn_model, num_epochs=1)
+_ = compile_and_train(conv_pool_cnn_model, num_epochs=30)
 evaluate_error(conv_pool_cnn_model)
 
 
-conv_pool_cnn_model.save_weights('/Users/rivaille/PycharmProjects/TensorFlowTraning/NN_keras/keras_single_hokousya/weights/model1.h5')

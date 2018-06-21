@@ -29,10 +29,13 @@ print(device_lib.list_local_devices())
 
 
 ###
-img_width, img_height = 64, 128
+img_width, img_height = 64, 96
 batch_size=32
-train_data_dir = '/Users/rivaille/Desktop/dataset_new/feng_exp/train/dataset5'
-validation_data_dir= '/Users/rivaille/Desktop/dataset_new/feng_exp/test/dataset1'
+#train_data_dir = '/Users/rivaille/Desktop/dataset_new/feng_exp/train/dataset5'
+#validation_data_dir= '/Users/rivaille/Desktop/dataset_new/feng_exp/test/dataset1'
+
+train_data_dir = 'C:/Users/USER/Desktop/feng_exp/train/dataset5'
+validation_data_dir= 'C:/Users/USER/Desktop/feng_exp/test/dataset1'
 nb_train_samples = 1280
 nb_validation_samples = 320
 #data_format,tensorflow of theaon
@@ -83,7 +86,7 @@ validation_generator = test_datagen.flow_from_directory(
 
 print("validation_generator.class_indices:",type(validation_generator.class_indices),validation_generator.class_indices)
 
-print(y_train)
+
 #First model: ConvPool-CNN-C
 
 model1 = Sequential()
@@ -106,14 +109,14 @@ model1.add(Dense(64))
 model1.add(Activation('relu'))
 model1.add(Dropout(0.5))
 model1.add(Dense(8))
-model1.add(Activation("softmax"))
+model1.add(Activation("sigmoid"))
 
 
 
 
 
 def compile_and_train(model, num_epochs):
-    model.compile(loss=categorical_crossentropy, optimizer=Adam(), metrics=['acc'])
+    model.compile(loss='categorical_crossentropy', optimizer=Adam(), metrics=['acc'])
     filepath = 'weights/' + model.name + '.{epoch:02d}-{loss:.2f}.hdf5'
     checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=0, save_weights_only=True,
                                  save_best_only=True, mode='auto', period=1)
@@ -134,10 +137,13 @@ def evaluate_error(model):
     print(type(pred))
     print(pred.shape)
     y_pre = to_categorical(pred, num_classes=10)
-    print(y_pre)
+    print(y_pre.shape)
 
-_ = compile_and_train(model1, num_epochs=1)
+_ = compile_and_train(model1, num_epochs=20)
 evaluate_error(model1)
 
+scoreSeg = model1.evaluate_generator(validation_generator,nb_train_samples // batch_size//2)
+print("Accuracy = ",scoreSeg[1])
 
-model1.save_weights('/Users/rivaille/PycharmProjects/TensorFlowTraning/NN_keras/keras_single_hokousya/weights/model1.h5')
+
+#model1.save_weights('/Users/rivaille/PycharmProjects/TensorFlowTraning/NN_keras/keras_single_hokousya/weights/model1.h5')
