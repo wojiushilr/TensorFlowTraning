@@ -2,8 +2,6 @@
 # import the necessary packages
 import matplotlib
 matplotlib.use("Agg")
-from sklearn.model_selection import train_test_split
-import tensorflow as tf
 from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, Dropout, Activation, Average
 from keras.layers import Activation, Dropout, Flatten, Dense
 from keras.utils import to_categorical
@@ -27,7 +25,7 @@ sys.path.append('..')
 
 #load data/labels from folder with my own rules
 def load_data(path):
-    print("loading experiment dataset1...")
+    print("loading experiment dataset5...")
     data = []
     labels = []
     # grab the image paths and randomly shuffle them
@@ -73,7 +71,7 @@ if K.image_data_format() == 'channels_first':
 else:
     input_shape = (img_width, img_height, 3)
 
-#model_1
+#model_2
 def model_create(shape):
 
     model = Sequential()
@@ -122,7 +120,7 @@ def evaluate_error(model):
     return error
 
 
-model1 = model_create(input_shape)
-_ = compile_and_train(model1, num_epochs=epochs)
-err=evaluate_error(model1)
+model5 = model_create(input_shape)
+_ = compile_and_train(model5, num_epochs=epochs)
+err=evaluate_error(model5)
 print('error',err)
