@@ -57,8 +57,8 @@ def load_data(path):
     labels = to_categorical(labels, num_classes=8)
     return data,labels
 
-X_train,y_train = load_data('/Users/rivaille/Desktop/dataset_new/feng_exp/train')
-X_test,y_test = load_data('/Users/rivaille/Desktop/dataset_new/feng_exp/test')
+X_train,y_train = load_data('/Users/rivaille/Desktop/experiment_data/model1/train')
+X_test,y_test = load_data('/Users/rivaille/Desktop/experiment_data/model1/test')
 y_test = np.argmax(y_test , axis=1)
 
 print(X_train.shape)
