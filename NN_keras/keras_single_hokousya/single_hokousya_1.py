@@ -24,7 +24,7 @@ import cv2
 import os
 import sys
 sys.path.append('..')
-
+#D:\Lab_Program\TensorFlowTraning\NN_keras\keras_single_hokoousya\logs1
 #load data/labels from folder with my own rules
 def load_data(path):
     print("loading experiment dataset1...")
@@ -57,8 +57,8 @@ def load_data(path):
     labels = to_categorical(labels, num_classes=8)
     return data,labels
 
-X_train,y_train = load_data('/Users/rivaille/Desktop/experiment_data/model1/train')
-X_test,y_test = load_data('/Users/rivaille/Desktop/experiment_data/model1/test')
+X_train,y_train = load_data('C:\\Users\\USER\\Desktop\\experiment_data\\model1\\train')
+X_test,y_test = load_data('C:\\Users\\USER\\Desktop\\experiment_data\\model1\\test')
 y_test = np.argmax(y_test , axis=1)
 
 print(X_train.shape)
