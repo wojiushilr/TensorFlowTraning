@@ -1,19 +1,11 @@
 #BY LR 20180621
 # import the necessary packages
-import matplotlib
-matplotlib.use("Agg")
-from sklearn.model_selection import train_test_split
-import tensorflow as tf
 from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, Dropout, Activation, Average
 from keras.layers import Activation, Dropout, Flatten, Dense
-from keras.utils import to_categorical
 from keras.losses import categorical_crossentropy
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.optimizers import Adam
-import numpy as np
-import os
 from keras import backend as K
-from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.preprocessing.image import img_to_array
 from keras.utils import to_categorical
@@ -21,10 +13,10 @@ from imutils import paths
 import numpy as np
 import random
 import cv2
-import os
 import sys
+import os
 sys.path.append('..')
-#D:\Lab_Program\TensorFlowTraning\NN_keras\keras_single_hokoousya\logs1
+
 #load data/labels from folder with my own rules
 def load_data(path):
     print("loading experiment dataset1...")
@@ -57,21 +49,25 @@ def load_data(path):
     labels = to_categorical(labels, num_classes=8)
     return data,labels
 
-X_train,y_train = load_data('C:\\Users\\USER\\Desktop\\experiment_data\\model1\\train')
-X_test,y_test = load_data('C:\\Users\\USER\\Desktop\\experiment_data\\model1\\test')
-y_test = np.argmax(y_test , axis=1)
-
-print(X_train.shape)
 
 #parameter setting
 img_width, img_height = 64, 96
 epochs = 20
 batch_size = 32
-#data_format,tensorflow of theaon
+train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model1\\train'
+test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model1\\test'
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
 else:
     input_shape = (img_width, img_height, 3)
+
+#data_reading
+X_train,y_train = load_data(train_dir)
+X_test,y_test = load_data(test_dir)
+y_test = np.argmax(y_test , axis=1)
+
+print(X_train.shape)
+
 
 #model_1
 def model_create(shape):
