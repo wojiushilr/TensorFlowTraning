@@ -1,6 +1,6 @@
 #BY LR 20180621
 # import the necessary packages
-from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, Dropout, Activation, Average
+from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, Average
 from keras.layers import Activation, Dropout, Flatten, Dense
 from keras.losses import categorical_crossentropy
 from keras.callbacks import ModelCheckpoint, TensorBoard
@@ -9,12 +9,15 @@ from keras import backend as K
 from keras.models import Sequential
 from keras.preprocessing.image import img_to_array
 from keras.utils import to_categorical
+from keras.models import Model, Input
 from imutils import paths
 import numpy as np
 import random
 import cv2
 import sys
 import os
+from keras.models import load_model
+
 sys.path.append('..')
 
 #load data/labels from folder with my own rules
@@ -61,43 +64,46 @@ if K.image_data_format() == 'channels_first':
 else:
     input_shape = (img_width, img_height, 3)
 
+model_input = Input(shape=input_shape)
+
 #data_reading
 X_train,y_train = load_data(train_dir)
 X_test,y_test = load_data(test_dir)
 y_test = np.argmax(y_test , axis=1)
 
+
 print(X_train.shape)
+print(X_train)
 
 
 #model_1
-def model_create(shape):
-
-    model = Sequential()
-    model.add(Conv2D(32, (3, 3), input_shape=shape)) #3*3
-    model.add(Activation('relu'))
-    model.add(Conv2D(32, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(Conv2D(32, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))#2*2
-
-    model.add(Conv2D(64, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(Conv2D(64, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-
-    model.add(Flatten())
-    model.add(Dense(64))
-    model.add(Activation('relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(8))
-    model.add(Activation("softmax"))
+def model_create(model_input):
+    # mlpconv block 1
+    x = Conv2D(32, (5, 5), activation='relu', padding='valid')(model_input)
+    x = Conv2D(32, (1, 1), activation='relu')(x)
+    x = Conv2D(32, (1, 1), activation='relu')(x)
+    x = MaxPooling2D((2, 2))(x)
+    x = Dropout(0.5)(x)
+    # mlpconv block2
+    x = Conv2D(64, (3, 3), activation='relu', padding='valid')(x)
+    x = Conv2D(64, (1, 1), activation='relu')(x)
+    x = Conv2D(64, (1, 1), activation='relu')(x)
+    x = MaxPooling2D((2, 2))(x)
+    x = Dropout(0.5)(x)
+    # mlpconv block3
+    x = Conv2D(128, (3, 3), activation='relu', padding='valid')(x)
+    x = Conv2D(32, (1, 1), activation='relu')(x)
+    x = Flatten()(x)
+    x = Dense(8)(x)
+    x = Activation(activation='softmax')(x)
+    model = Model(model_input, x, name='nin_cnn')
     return model
+
+
 
 def compile_and_train(model, num_epochs):
 
-    model.compile(loss=categorical_crossentropy, optimizer=Adam(), metrics=['acc'])
+    model.compile(loss=categorical_crossentropy, optimizer=Adam(lr=1e-4), metrics=['acc'])
     filepath = 'weights/' + model.name + '.{epoch:02d}-{loss:.2f}.hdf5'
     checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=0, save_weights_only=True,
                                  save_best_only=True, mode='auto', period=1)
@@ -118,7 +124,9 @@ def evaluate_error(model):
     return error
 
 
-model1 = model_create(input_shape)
+model1 = model_create(model_input)
 _ = compile_and_train(model1, num_epochs=epochs)
 err=evaluate_error(model1)
 print('error',err)
+
+model1.save('model1.h5')

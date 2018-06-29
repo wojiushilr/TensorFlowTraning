@@ -1,17 +1,11 @@
 #BY LR 20180621
 # import the necessary packages
-import matplotlib
-matplotlib.use("Agg")
 from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, Dropout, Activation, Average
 from keras.layers import Activation, Dropout, Flatten, Dense
-from keras.utils import to_categorical
 from keras.losses import categorical_crossentropy
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.optimizers import Adam
-import numpy as np
-import os
 from keras import backend as K
-from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
 from keras.preprocessing.image import img_to_array
 from keras.utils import to_categorical
@@ -19,13 +13,13 @@ from imutils import paths
 import numpy as np
 import random
 import cv2
-import os
 import sys
+import os
 sys.path.append('..')
 
 #load data/labels from folder with my own rules
 def load_data(path):
-    print("loading experiment dataset4...")
+    print("loading experiment dataset1...")
     data = []
     labels = []
     # grab the image paths and randomly shuffle them
@@ -55,21 +49,24 @@ def load_data(path):
     labels = to_categorical(labels, num_classes=8)
     return data,labels
 
-X_train,y_train = load_data('/Users/rivaille/Desktop/dataset_new/feng_exp/train')
-X_test,y_test = load_data('/Users/rivaille/Desktop/dataset_new/feng_exp/test')
-y_test = np.argmax(y_test , axis=1)
-
-print(X_train.shape)
 
 #parameter setting
 img_width, img_height = 64, 96
 epochs = 20
 batch_size = 32
-#data_format,tensorflow of theaon
+train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model4\\train'
+test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model4\\test'
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
 else:
     input_shape = (img_width, img_height, 3)
+
+#data_reading
+X_train,y_train = load_data(train_dir)
+X_test,y_test = load_data(test_dir)
+y_test = np.argmax(y_test , axis=1)
+
+print(X_train.shape)
 
 #model_4
 def model_create(shape):
@@ -100,10 +97,10 @@ def model_create(shape):
 def compile_and_train(model, num_epochs):
 
     model.compile(loss=categorical_crossentropy, optimizer=Adam(), metrics=['acc'])
-    filepath = 'weights/' + model.name + '.{epoch:02d}-{loss:.2f}.hdf5'
+    filepath = 'weights4/' + model.name + '.{epoch:02d}-{loss:.2f}.hdf5'
     checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=0, save_weights_only=True,
                                  save_best_only=True, mode='auto', period=1)
-    tensor_board = TensorBoard(log_dir='logs1/', histogram_freq=0, batch_size=batch_size)
+    tensor_board = TensorBoard(log_dir='logs4/', histogram_freq=0, batch_size=batch_size)
     history = model.fit(x=X_train, y=y_train, batch_size=batch_size,
                         epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board], validation_split=0.2)
     return history

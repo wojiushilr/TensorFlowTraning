@@ -2,6 +2,8 @@
 # import the necessary packages
 from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, Dropout, Activation, Average
 from keras.layers import Activation, Dropout, Flatten, Dense
+from keras.models import Model, Input
+from keras.models import load_model
 from keras.losses import categorical_crossentropy
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.optimizers import Adam
@@ -16,6 +18,7 @@ import cv2
 import sys
 import os
 sys.path.append('..')
+
 
 #load data/labels from folder with my own rules
 def load_data(path):
@@ -38,7 +41,7 @@ def load_data(path):
         # extract the class label from the image path and update the
         # labels list
         label = int(imagePath.split(os.path.sep)[-2])
-        print('label',label)
+        #print('label',label)
         labels.append(label)
 
     # scale the raw pixel intensities to the range [0, 1]
@@ -54,8 +57,8 @@ def load_data(path):
 img_width, img_height = 64, 96
 epochs = 20
 batch_size = 32
-train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model5\\train'
-test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model5\\test'
+train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model2\\train'
+test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model2\\test'
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
 else:
@@ -65,59 +68,29 @@ else:
 X_train,y_train = load_data(train_dir)
 X_test,y_test = load_data(test_dir)
 y_test = np.argmax(y_test , axis=1)
+print('y_test',y_test)
 
 print(X_train.shape)
 
-#model_2
-def model_create(shape):
 
-    model = Sequential()
-    model.add(Conv2D(32, (3, 3), input_shape=shape)) #3*3
-    model.add(Activation('relu'))
-    model.add(Conv2D(32, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(Conv2D(32, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))#2*2
+#ensemble model
 
-    model.add(Conv2D(64, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(Conv2D(64, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+model1 = load_model('model1.h5')
+models=[model1,model1]
 
-    model.add(Flatten())
-    model.add(Dense(64))
-    model.add(Activation('relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(8))
-    model.add(Activation("softmax"))
+def ensemble(models, model_input):
+
+    outputs = [model.outputs[0] for model in models]
+    y = Average()(outputs)
+
+    model = Model(model_input , y , name="ensemble")
     return model
 
-def compile_and_train(model, num_epochs):
+model_input = Input(shape=input_shape)
+ensemble_model = ensemble(models,model_input)
 
-    model.compile(loss=categorical_crossentropy, optimizer=Adam(), metrics=['acc'])
-    filepath = 'weights5/' + model.name + '.{epoch:02d}-{loss:.2f}.hdf5'
-    checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=0, save_weights_only=True,
-                                 save_best_only=True, mode='auto', period=1)
-    tensor_board = TensorBoard(log_dir='logs5/', histogram_freq=0, batch_size=batch_size)
-    history = model.fit(x=X_train, y=y_train, batch_size=batch_size,
-                        epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board], validation_split=0.2)
-    return history
-
-def evaluate_error(model):
-
-    pred = model.predict(X_test, batch_size = batch_size)
-    pred = np.argmax(pred, axis=1)
-    print(pred.shape)
-    #pred = np.expand_dims(pred, axis=1) # make same shape as y_test
-    #pred = to_categorical(pred, num_classes=10)
-    print(y_test.shape[0])
-    error = np.sum(np.not_equal(pred, y_test)) / y_test.shape[0]
-    return error
-
-
-model5 = model_create(input_shape)
-_ = compile_and_train(model5, num_epochs=epochs)
-err=evaluate_error(model5)
-print('error',err)
+pred = ensemble_model.predict(X_test)
+pred = np.argmax(pred, axis=1)
+print(pred)
+error = np.sum(np.not_equal(pred, y_test)) / y_test.shape[0]
+print(error)

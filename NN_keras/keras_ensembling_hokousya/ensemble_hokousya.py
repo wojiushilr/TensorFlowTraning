@@ -2,6 +2,8 @@
 # import the necessary packages
 from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, Dropout, Activation, Average
 from keras.layers import Activation, Dropout, Flatten, Dense
+from keras.models import Model, Input
+from keras.models import load_model
 from keras.losses import categorical_crossentropy
 from keras.callbacks import ModelCheckpoint, TensorBoard
 from keras.optimizers import Adam
@@ -16,6 +18,7 @@ import cv2
 import sys
 import os
 sys.path.append('..')
+
 
 #load data/labels from folder with my own rules
 def load_data(path):
@@ -54,12 +57,14 @@ def load_data(path):
 img_width, img_height = 64, 96
 epochs = 20
 batch_size = 32
-train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model5\\train'
-test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model5\\test'
+train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model2\\train'
+test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model2\\test'
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
 else:
     input_shape = (img_width, img_height, 3)
+
+print(input_shape)
 
 #data_reading
 X_train,y_train = load_data(train_dir)
@@ -68,7 +73,6 @@ y_test = np.argmax(y_test , axis=1)
 
 print(X_train.shape)
 
-#model_2
 def model_create(shape):
 
     model = Sequential()
@@ -94,13 +98,29 @@ def model_create(shape):
     model.add(Activation("softmax"))
     return model
 
+
+#ensemble model
+
+model1 = load_model('model1.h5')
+models=[model1,model1]
+
+def ensemble(models, model_input):
+
+    outputs = [model.outputs[0] for model in models]
+    y = Average()(outputs)
+
+    model = Model(model_input , y , name="ensemble")
+    return model
+
+
+
 def compile_and_train(model, num_epochs):
 
     model.compile(loss=categorical_crossentropy, optimizer=Adam(), metrics=['acc'])
-    filepath = 'weights5/' + model.name + '.{epoch:02d}-{loss:.2f}.hdf5'
+    filepath = 'weights/' + model.name + '.{epoch:02d}-{loss:.2f}.hdf5'
     checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=0, save_weights_only=True,
                                  save_best_only=True, mode='auto', period=1)
-    tensor_board = TensorBoard(log_dir='logs5/', histogram_freq=0, batch_size=batch_size)
+    tensor_board = TensorBoard(log_dir='logs/', histogram_freq=0, batch_size=batch_size)
     history = model.fit(x=X_train, y=y_train, batch_size=batch_size,
                         epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board], validation_split=0.2)
     return history
@@ -116,8 +136,8 @@ def evaluate_error(model):
     error = np.sum(np.not_equal(pred, y_test)) / y_test.shape[0]
     return error
 
-
-model5 = model_create(input_shape)
-_ = compile_and_train(model5, num_epochs=epochs)
-err=evaluate_error(model5)
+model_input = Input(shape=input_shape)
+ensemble_model = ensemble(models,model_input)
+_ = compile_and_train(ensemble_model,num_epochs=20)
+err = evaluate_error(ensemble_model)
 print('error',err)

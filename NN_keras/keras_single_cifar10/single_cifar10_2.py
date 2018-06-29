@@ -19,7 +19,7 @@ y_train = to_categorical(y_train, num_classes=10)
 # images are used for training/validation and the other 10000 for testing
 print('x_train shape: {} | y_train shape: {}\nx_test shape : {} | y_test shape : {}'.format(
     x_train.shape, y_train.shape,x_test.shape, y_test.shape))
-print(type(x_test))
+print(type(x_train))
 
 input_shape_train = x_train[0,:,:,:].shape
 input_shape_label = y_test[0:10,:]
