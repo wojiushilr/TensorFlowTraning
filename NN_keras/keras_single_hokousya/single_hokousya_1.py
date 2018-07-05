@@ -55,7 +55,7 @@ def load_data(path):
 
 #parameter setting
 img_width, img_height = 64, 96
-epochs = 20
+epochs = 100
 batch_size = 32
 train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model1\\train'
 test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model1\\test'
@@ -96,7 +96,7 @@ def model_create(model_input):
     x = Flatten()(x)
     x = Dense(8)(x)
     x = Activation(activation='softmax')(x)
-    model = Model(model_input, x, name='nin_cnn')
+    model = Model(model_input, x, name='nin_cnn1')
     return model
 
 
@@ -128,5 +128,5 @@ model1 = model_create(model_input)
 _ = compile_and_train(model1, num_epochs=epochs)
 err=evaluate_error(model1)
 print('error',err)
-
+print('acc',1-err)
 model1.save('model1.h5')

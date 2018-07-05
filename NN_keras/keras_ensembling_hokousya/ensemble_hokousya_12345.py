@@ -55,10 +55,10 @@ def load_data(path):
 
 #parameter setting
 img_width, img_height = 64, 96
-epochs = 20
+epochs = 10
 batch_size = 32
-train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model2\\train'
-test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model2\\test'
+train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model1\\train'
+test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model1\\test'
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
 else:
@@ -70,49 +70,25 @@ print(input_shape)
 X_train,y_train = load_data(train_dir)
 X_test,y_test = load_data(test_dir)
 y_test = np.argmax(y_test , axis=1)
-
+model_input = Input(shape=input_shape)
 print(X_train.shape)
-
-def model_create(shape):
-
-    model = Sequential()
-    model.add(Conv2D(32, (3, 3), input_shape=shape)) #3*3
-    model.add(Activation('relu'))
-    model.add(Conv2D(32, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(Conv2D(32, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))#2*2
-
-    model.add(Conv2D(64, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(Conv2D(64, (3, 3)))
-    model.add(Activation('relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-
-    model.add(Flatten())
-    model.add(Dense(64))
-    model.add(Activation('relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(8))
-    model.add(Activation("softmax"))
-    return model
-
 
 #ensemble model
 
 model1 = load_model('model1.h5')
-models=[model1,model1]
+model2 = load_model('model2.h5')
+model3 = load_model('model3.h5')
+model4 = load_model('model4.h5')
+model5 = load_model('model5.h5')
+models=[model1,model2,model3,model4,model5]
 
 def ensemble(models, model_input):
 
-    outputs = [model.outputs[0] for model in models]
+    outputs = [model(model_input) for model in models]
     y = Average()(outputs)
 
     model = Model(model_input , y , name="ensemble")
     return model
-
-
 
 def compile_and_train(model, num_epochs):
 
@@ -136,8 +112,9 @@ def evaluate_error(model):
     error = np.sum(np.not_equal(pred, y_test)) / y_test.shape[0]
     return error
 
-model_input = Input(shape=input_shape)
+
 ensemble_model = ensemble(models,model_input)
-_ = compile_and_train(ensemble_model,num_epochs=20)
+_ = compile_and_train(ensemble_model,num_epochs=epochs)
 err = evaluate_error(ensemble_model)
 print('error',err)
+print('acc',1-err)
