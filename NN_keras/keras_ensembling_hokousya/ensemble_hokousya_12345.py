@@ -58,7 +58,7 @@ img_width, img_height = 64, 96
 epochs = 10
 batch_size = 32
 train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model1\\train'
-test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model1\\test'
+test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\ensemble\\test1'
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
 else:
@@ -68,10 +68,11 @@ print(input_shape)
 
 #data_reading
 X_train,y_train = load_data(train_dir)
-X_test,y_test = load_data(test_dir)
-y_test = np.argmax(y_test , axis=1)
+X_test,y_test0 = load_data(test_dir)
+y_test = np.argmax(y_test0 , axis=1)
 model_input = Input(shape=input_shape)
-print(X_train.shape)
+print(model_input)
+
 
 #ensemble model
 
@@ -85,6 +86,8 @@ models=[model1,model2,model3,model4,model5]
 def ensemble(models, model_input):
 
     outputs = [model(model_input) for model in models]
+
+    #outputs = [model.outputs[0] for model in models]
     y = Average()(outputs)
 
     model = Model(model_input , y , name="ensemble")
@@ -92,7 +95,7 @@ def ensemble(models, model_input):
 
 def compile_and_train(model, num_epochs):
 
-    model.compile(loss=categorical_crossentropy, optimizer=Adam(), metrics=['acc'])
+    #model.compile(loss=categorical_crossentropy, optimizer=Adam(), metrics=['acc'])
     filepath = 'weights/' + model.name + '.{epoch:02d}-{loss:.2f}.hdf5'
     checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=0, save_weights_only=True,
                                  save_best_only=True, mode='auto', period=1)
@@ -114,7 +117,21 @@ def evaluate_error(model):
 
 
 ensemble_model = ensemble(models,model_input)
-_ = compile_and_train(ensemble_model,num_epochs=epochs)
+#_ = compile_and_train(ensemble_model,num_epochs=epochs)
 err = evaluate_error(ensemble_model)
 print('error',err)
 print('acc',1-err)
+
+loss1,acc1 = model1.evaluate(X_test,y_test0)
+loss2,acc2 = model2.evaluate(X_test,y_test0)
+loss3,acc3 = model3.evaluate(X_test,y_test0)
+loss4,acc4 = model4.evaluate(X_test,y_test0)
+loss5,acc5 = model5.evaluate(X_test,y_test0)
+
+print('loss1,acccccc1',loss1,acc1)
+print('loss2,acccccc2',loss2,acc2)
+print('loss3,acccccc3',loss3,acc3)
+print('loss4,acccccc4',loss4,acc4)
+print('loss5,acccccc5',loss5,acc5)
+print('ensemble error',err)
+print('ensemble acc',1-err)
