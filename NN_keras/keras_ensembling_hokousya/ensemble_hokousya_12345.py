@@ -57,8 +57,8 @@ def load_data(path):
 img_width, img_height = 64, 96
 epochs = 10
 batch_size = 32
-train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model1\\train'
-test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\ensemble\\test1'
+train_dir = '/Users/rivaille/Desktop/experiment_data/model1/train'
+test_dir = '/Users/rivaille/Desktop/experiment_data/model1/test'
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
 else:
