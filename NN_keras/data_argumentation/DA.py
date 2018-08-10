@@ -4,7 +4,6 @@ from scipy.misc import imresize
 from scipy.ndimage.interpolation import rotate
 
 
-
 def read_image(imagefile, dtype=np.float32):
     image = np.array(Image.open(imagefile), dtype=dtype)
     return image
