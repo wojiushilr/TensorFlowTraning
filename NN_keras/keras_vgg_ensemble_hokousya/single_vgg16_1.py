@@ -34,7 +34,7 @@ def load_data(path):
     for imagePath in imagePaths:
         # load the image, pre-process it, and store it in the data list
         image = cv2.imread(imagePath)
-        image = cv2.resize(image, (96, 64))
+        image = cv2.resize(image, (288, 192))
         image = img_to_array(image)
         data.append(image)
 
@@ -54,11 +54,11 @@ def load_data(path):
 
 
 #parameter setting
-img_width, img_height = 64, 96
-epochs = 15
-batch_size = 32
-train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model1\\train'
-test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model1\\test'
+img_width, img_height = 192, 288
+epochs = 6
+batch_size = 12
+train_dir = 'C:\\Users\\USER\\Desktop\\data_exp\\model1\\train'
+#test_dir = 'C:\\Users\\USER\\Desktop\\data_exp\\model1\\test'
 if K.image_data_format() == 'channels_first':
     input_shape = (3,img_width,img_height)
 else:
@@ -67,7 +67,8 @@ model_input = Input(shape=input_shape)
 
 #data_reading
 X_train,y_train = load_data(train_dir)
-X_test,y_test = load_data(test_dir)
+
+#X_test,y_test = load_data(test_dir)
 print(X_train.shape)
 print(y_train)
 
@@ -75,28 +76,28 @@ print(y_train)
 #model_1
 def model_create(model_input):
 
-    x = Conv2D(64, (3, 3),activation='relu',name='block1_conv1')(model_input)
-    x = Conv2D(64, (3, 3),activation='relu',name='block1_conv2')(x)
+    x = Conv2D(64, (3, 3),activation='relu',padding='same',name='block1_conv1')(model_input)
+    x = Conv2D(64, (3, 3),activation='relu',padding='same',name='block1_conv2')(x)
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)
     # ///////////////////////////////
-    x = Conv2D(128, (3, 3),activation='relu', name='block2_conv1')(x)
-    x = Conv2D(128, (3, 3),activation='relu', name='block2_conv2')(x)
+    x = Conv2D(128, (3, 3),activation='relu',padding='same', name='block2_conv1')(x)
+    x = Conv2D(128, (3, 3),activation='relu',padding='same', name='block2_conv2')(x)
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)
     # ///////////////////////////////
-    x = Conv2D(256, (3, 3),activation='relu',name='block3_conv1')(x)
-    x = Conv2D(256, (3, 3),activation='relu',name='block3_conv2')(x)
-    x = Conv2D(256, (3, 3),activation='relu',name='block3_conv3')(x)
+    x = Conv2D(256, (3, 3),activation='relu',padding='same',name='block3_conv1')(x)
+    x = Conv2D(256, (3, 3),activation='relu',padding='same',name='block3_conv2')(x)
+    x = Conv2D(256, (3, 3),activation='relu',padding='same',name='block3_conv3')(x)
     x = MaxPooling2D((2, 2), strides=(2, 2))(x)
     # ///////////////////////////////
-    x = Conv2D(512, (3, 3),padding='same', activation='relu')(x)
-    x = Conv2D(512, (3, 3),padding='same', activation='relu')(x)
-    x = Conv2D(512, (3, 3),padding='same', activation='relu')(x)
-
+    x = Conv2D(512, (3, 3), activation='relu',padding='same',name='block4_conv1')(x)
+    x = Conv2D(512, (3, 3), activation='relu',padding='same',name='block4_conv2')(x)
+    x = Conv2D(512, (3, 3), activation='relu',padding='same',name='block4_conv3')(x)
+    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
     # ///////////////////////////////
-    x = Conv2D(512, (3, 3),padding='same', activation='relu')(x)
-    x = Conv2D(512, (3, 3),padding='same', activation='relu')(x)
-    x = Conv2D(512, (3, 3),padding='same', activation='relu')(x)
-
+    x = Conv2D(512, (3, 3), activation='relu',padding='same',name='block5_conv1')(x)
+    x = Conv2D(512, (3, 3), activation='relu',padding='same',name='block5_conv2')(x)
+    x = Conv2D(512, (3, 3), activation='relu',padding='same',name='block5_conv3')(x)
+    x = MaxPooling2D((2, 2), strides=(1, 1))(x)
     # //////////////////////////////
     x = Flatten()(x)
     x = Dense(4096,activation="relu")(x)
