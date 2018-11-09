@@ -1,7 +1,8 @@
 #edit by LR 20180110
 import tensorflow as tf
 from keras.models import Model, Input
-from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, Dropout, Activation, Average
+from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, Dropout, Activation, Average,\
+    Activation, Dropout, Flatten, Dense, ZeroPadding2D
 from keras.utils import to_categorical
 from keras.losses import categorical_crossentropy
 from keras.callbacks import ModelCheckpoint, TensorBoard
@@ -62,21 +63,83 @@ def evaluate_error(model):
 
 #First model: ConvPool-CNN-C
 def conv_pool_cnn(model_input):
-    x = Conv2D(96, kernel_size=(3, 3), activation='relu', padding='same')(model_input)
-    x = Conv2D(96, (3, 3), activation='relu', padding='same')(x)
-    x = Conv2D(96, (3, 3), activation='relu', padding='same')(x)
-    x = MaxPooling2D(pool_size=(3, 3), strides=2)(x)
-    x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
-    x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
-    x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
-    x = MaxPooling2D(pool_size=(3, 3), strides=2)(x)
-    x = Conv2D(192, (3, 3), activation='relu', padding='same')(x)
-    x = Conv2D(192, (1, 1), activation='relu')(x)
-    x = Conv2D(10, (1, 1))(x)
-    x = GlobalAveragePooling2D()(x)
-    x = Activation(activation='softmax')(x)
-    model = Model(model_input, x, name='all_cnn')
-    return model
+
+        x = Conv2D(64, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='block1_conv1')(model_input)
+        x = Conv2D(64, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='block1_conv2')(x)
+        x = MaxPooling2D((2, 2), strides=2)(x)
+
+        # ///////////////////////////////
+        x = Conv2D(128, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='block2_conv1')(x)
+        x = Conv2D(128, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='block2_conv2')(x)
+        x = MaxPooling2D((2, 2), strides=2)(x)
+
+        # ///////////////////////////////
+        x = Conv2D(256, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='block3_conv1')(x)
+        x = Conv2D(256, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='block3_conv2')(x)
+        x = Conv2D(256, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='block3_conv3')(x)
+        x = MaxPooling2D((2, 2), strides=2)(x)
+
+        # ///////////////////////////////
+        x = Conv2D(512, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='block4_conv1')(x)
+        x = Conv2D(512, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='block4_conv2')(x)
+        x = Conv2D(512, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='block4_conv3')(x)
+        x = MaxPooling2D((2, 2), strides=2)(x)
+        # ///////////////////////////////
+        x = Conv2D(512, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='block5_conv1')(x)
+        x = Conv2D(512, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='block5_conv2')(x)
+        x = Conv2D(512, (3, 3),
+                   activation='relu',
+                   padding='same',
+                   name='block5_conv3')(x)
+
+        # ///////////////////////////////
+        x = Flatten()(x)
+        x = Dense(4096, activation="relu")(x)
+        x = Dropout(0.5)(x)
+        x = Dense(4096, activation="relu")(x)
+        x = Dropout(0.5)(x)
+        x = Dense(10)(x)
+
+        x = Activation(activation='softmax')(x)
+        model = Model(model_input, x, name='vgg16_1')
+        return model
+
 conv_pool_cnn_model = conv_pool_cnn(model_input)
 _ = compile_and_train(conv_pool_cnn_model, num_epochs=20)
 evaluate_error(conv_pool_cnn_model)

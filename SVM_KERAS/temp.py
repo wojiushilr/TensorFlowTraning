@@ -19,43 +19,44 @@ def img2vector(imgFile):
     return img_arr2
 
 '''
+num1 = 6400
 
-
-def image_to_array_0():
+def image_to_array_0(j):
     """
     图片转化为数组并存为二进制文件；
     :param filenames:文件列表
     :return:
     """
-    image_base_path = "C:\\Users\\Rivaille\\Desktop\\dataset3\\feng_1\\feng_learn\\0\\"
+    image_base_path = "/Users/rivaille/Desktop/experiment_data/model1/train/{}/".format(j)
+    print(image_base_path)
 
-    filenames_0 = os.listdir("C:\\Users\\Rivaille\\Desktop\\dataset3\\feng_1\\feng_learn\\0")
+    filenames_0 = os.listdir("/Users/rivaille/Desktop/experiment_data/model1/train/{}/".format(j))
     n = len(filenames_0) # 获取图片的个数
     result = np.array([])  # 创建一个空的一维数组
-    label = np.empty((778,),dtype="int")
+    label = np.empty((800,),dtype="int")
 
     for i in range(n):
         image = Image.open(image_base_path + filenames_0[i])
         r, g, b = image.split()  # rgb通道分离
         # 注意：下面一定要reshpae(8192)使其变为一维数组，否则拼接的数据会出现错误，导致无法恢复图片
-        r_arr = np.array(r).reshape(8192)
-        g_arr = np.array(g).reshape(8192)
-        b_arr = np.array(b).reshape(8192)
+        r_arr = np.array(r).reshape(6144)
+        g_arr = np.array(g).reshape(6144)
+        b_arr = np.array(b).reshape(6144)
         # 行拼接，类似于接火车；最终结果：共n行，一行24576列，为一张图片的rgb值
         image_arr = np.concatenate((r_arr, g_arr, b_arr))
         result = np.concatenate((result, image_arr))
         #print(result)
-        label[i] = int(0)
+        label[i] = int(j)
     print("start pic transform to array of label:{label}".format(label=label[0]))
-    result = result.reshape((n, 24576))
+    result = result.reshape((n, 18432))
     print("transform success!")
-    print(result.shape)
+    #print(result.shape)
     #file_path = self.data_base_path + "data2.bin"
     #with open(file_path, mode='wb') as f:
     #    p.dump(result, f)
     #print("保存文件成功")
     return  result,label
-
+'''
 def image_to_array_1():
     """
     图片转化为数组并存为二进制文件；
@@ -89,6 +90,7 @@ def image_to_array_1():
     #    p.dump(result, f)
     #print("保存文件成功")
     return  result,label
+'''
 
 def svc(traindata,trainlabel,testdata,testlabel):
     print("Start training SVM...")
@@ -126,26 +128,31 @@ def rf(traindata,trainlabel,testdata,testlabel):
     print(pred_testlabel[100:110])
 
 #get data and label
+data = []
+label = []
+for i in range(8):
 
-x_0,y_0 = image_to_array_0()
-x_1,y_1 = image_to_array_1()
+    x, y = image_to_array_0(i)
+    data.append(x)
+    label.append(y)
+
+    print(x.shape)
+    print(y.shape)
+
 #print(x_0.shape)
 #print(x_1.shape)
 #print(y_0[100:110])
 #print(y_1[100:110])
 
 #data reform to 2D
-data = np.append(x_0,x_1)
-data = np.reshape(data,(1258,-1))
-label = np.append(y_0,y_1)
-
+data = np.reshape(data,(num1,-1))
+label = np.reshape(label,(num1))
 #shuffle the data
 #np.random.seed(1024)
-index_test = [i for i in range(len(data))]
-print("index_test",index_test[0:10])
-np.random.shuffle(index_test)
-data = data[index_test]
-label = label[index_test]
+np.random.shuffle(data)
+np.random.shuffle(label)
+
+
 print(data.shape)
 print(label[780:790])
 
@@ -172,6 +179,8 @@ accuracy = len([1 for i in range(num) if y_test[i]==pred_testlabel[i]])/float(nu
 print("Adaboost Accuracy:",accuracy)'''
 
 #start training
+
+
 svc(x_train, y_train, x_test, y_test)
 ada(x_train, y_train, x_test, y_test)
 rf(x_train, y_train, x_test, y_test)

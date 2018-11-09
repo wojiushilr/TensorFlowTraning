@@ -75,70 +75,71 @@ print(X_train.shape)
 #model_1
 def model_create(model_input):
 
-    x = Conv2D(64, (3, 3),
+    x = Conv2D(32, (3, 3),
                activation='relu',
-               padding='same',
+
                name='block1_conv1')(model_input)
-    x = Conv2D(64, (3, 3),
+    x = Conv2D(32, (3, 3),
                activation='relu',
-               padding='same',
+
                name='block1_conv2')(x)
-    x = MaxPooling2D((2, 2), strides=2)(x)
+
 
     # ///////////////////////////////
-    x = Conv2D(128, (3, 3),
+    x = Conv2D(64, (3, 3),
                activation='relu',
-               padding='same',
+
                name='block2_conv1')(x)
-    x = Conv2D(128, (3, 3),
+    x = Conv2D(64, (3, 3),
                activation='relu',
-               padding='same',
+
                name='block2_conv2')(x)
-    x = MaxPooling2D((2, 2), strides=2)(x)
+
 
     # ///////////////////////////////
     x = Conv2D(256, (3, 3),
                activation='relu',
-               padding='same',
+
                name='block3_conv1')(x)
     x = Conv2D(256, (3, 3),
                activation='relu',
-               padding='same',
+
                name='block3_conv2')(x)
     x = Conv2D(256, (3, 3),
                activation='relu',
-               padding='same',
+
                name='block3_conv3')(x)
-    x = MaxPooling2D((2, 2), strides=2)(x)
+
 
     # ///////////////////////////////
     x = Conv2D(512, (3, 3),
                activation='relu',
-               padding='same',
+
                name='block4_conv1')(x)
     x = Conv2D(512, (3, 3),
                activation='relu',
-               padding='same',
+
                name='block4_conv2')(x)
     x = Conv2D(512, (3, 3),
                activation='relu',
-               padding='same',
+
                name='block4_conv3')(x)
     x = MaxPooling2D((2, 2), strides=2)(x)
     # ///////////////////////////////
     x = Conv2D(512, (3, 3),
                activation='relu',
-               padding='same',
+
                name='block5_conv1')(x)
     x = Conv2D(512, (3, 3),
                activation='relu',
-               padding='same',
+
                name='block5_conv2')(x)
     x = Conv2D(512, (3, 3),
                activation='relu',
-               padding='same',
+
                name='block5_conv3')(x)
     x = MaxPooling2D((2, 2), strides=2)(x)
+
     # ///////////////////////////////
     x = Flatten()(x)
     x = Dense(4096,activation="relu")(x)

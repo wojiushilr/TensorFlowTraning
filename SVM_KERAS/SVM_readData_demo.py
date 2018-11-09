@@ -58,9 +58,6 @@ y_test = y_test[index_test]
 
 print(x_train.shape)
 print(y_test[100:110])
-#svc(x_train,y_train,x_test,y_test)
-
-
 
 bdt_real = AdaBoostClassifier(
      DecisionTreeClassifier(max_depth=2),
