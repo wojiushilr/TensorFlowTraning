@@ -1,4 +1,5 @@
 #edit by LR 20180610
+#2333333
 from keras.models import Model, Input
 from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D, Dropout, Activation, Average
 from keras.utils import to_categorical
@@ -25,7 +26,7 @@ y_train = to_categorical(y_train, num_classes=10)
 x_train = x_train[:,:,:,np.newaxis]
 x_test = x_test[:,:,:,np.newaxis]
 y_test = y_test[:,np.newaxis]
-#The dataset consists of 60000 32x32 RGB images from 10 classes. 50000
+#The dataset consists of 60000     32x32 RGB images from 10 classes. 50000
 # images are used for training/validation and the other 10000 for testing
 print('x_train shape: {} | y_train shape: {}\nx_test shape : {} | y_test shape : {}'.format(
     x_train.shape, y_train.shape,x_test.shape, y_test.shape))
@@ -33,7 +34,7 @@ print(type(x_test))
 
 input_shape_train = x_train[0,:,:,:].shape
 input_shape_label = y_test[0:100,:]
-print ("input_shape", input_shape_train)
+print ("input_shape——", input_shape_train)
 print ("label", input_shape_label)
 
 
@@ -78,6 +79,7 @@ def all_cnn(model_input):
     x = Activation(activation='softmax')(x)
     model = Model(model_input, x, name='all_cnn')
     return model
+
 all_cnn_model = all_cnn(model_input)
 _ = compile_and_train(all_cnn_model,num_epochs=5)
 evaluate_error(all_cnn_model)
