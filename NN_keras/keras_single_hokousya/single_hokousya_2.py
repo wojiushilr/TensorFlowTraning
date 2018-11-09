@@ -55,8 +55,8 @@ def load_data(path):
 img_width, img_height = 64, 96
 epochs = 20
 batch_size = 32
-train_dir2 = 'C:\\Users\\USER\\Desktop\\experiment_data\\model2\\train'
-test_dir2 = 'C:\\Users\\USER\\Desktop\\experiment_data\\model2\\test'
+train_dir2 = 'C:\\Users\\USER\\Desktop\\experiment_data\\model1\\train'
+#test_dir2 = 'C:\\Users\\USER\\Desktop\\experiment_data\\model2\\test'
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
 else:
@@ -64,7 +64,7 @@ else:
 
 #data_reading
 X_train,y_train = load_data(train_dir2)
-X_test,y_test = load_data(test_dir2)
+#X_test,y_test = load_data(test_dir2)
 #y_test = np.argmax(y_test , axis=1)
 model_input = Input(shape=input_shape)
 
@@ -97,7 +97,7 @@ def compile_and_train(model, num_epochs):
                                  save_best_only=True, mode='auto', period=1)
     tensor_board = TensorBoard(log_dir='logs2/', histogram_freq=0, batch_size=batch_size)
     history = model.fit(x=X_train, y=y_train, batch_size=batch_size,
-                        epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board],validation_data=(X_test,y_test))
+                        epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board],validation_split=0.2)
     return history
 
 

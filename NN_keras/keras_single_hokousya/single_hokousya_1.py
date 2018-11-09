@@ -75,18 +75,18 @@ print(X_train.shape)
 #model_1
 def model_create(model_input):
 
-    x = Conv2D(32, (3, 3), activation='relu')(model_input)
-    x = Conv2D(32, (3, 3), activation='relu')(x)
-    x = Conv2D(32, (3, 3), activation='relu')(x)
-    x = MaxPooling2D((2, 2))(x)
-
-    x = Conv2D(64, (3, 3), activation='relu')(x)
-    x = Conv2D(64, (1, 1), activation='relu')(x)
-    x = MaxPooling2D((2, 2))(x)
-
-    x = Conv2D(128, (3, 3), activation='relu')(x)
-    x = Conv2D(32, (1, 1), activation='relu')(x)
+    x = Conv2D(32, (3, 3), padding='same',activation='relu')(model_input)
+    x = Conv2D(32, (3, 3), padding='same',activation='relu')(x)
+    x = MaxPooling2D((2, 2), strides=2)(x)
+    x = Conv2D(64, (3, 3), padding='same',activation='relu')(x)
+    x = Conv2D(64, (3, 3), padding='same',activation='relu')(x)
+    x = Conv2D(64, (1, 1), padding='same',activation='relu')(x)
+    x = MaxPooling2D((2, 2), strides=2)(x)
+    x = Conv2D(128, (3, 3),padding='same', activation='relu')(x)
+    x = Conv2D(64, (3, 3),padding='same', activation='relu')(x)
+    x = Conv2D(32, (1, 1),padding='same', activation='relu')(x)
     x = Flatten()(x)
+
     x = Dense(8)(x)
     x = Activation(activation='softmax')(x)
     model = Model(model_input, x, name='nin_cnn1')
@@ -102,7 +102,7 @@ def compile_and_train(model, num_epochs):
                                  save_best_only=True, mode='auto', period=1)
     tensor_board = TensorBoard(log_dir='logs1/', histogram_freq=0, batch_size=batch_size)
     history = model.fit(x=X_train, y=y_train, batch_size=batch_size,
-                        epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board],validation_data=(X_test,y_test))
+                        epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board],validation_split=0.2)
     return history
 
 
