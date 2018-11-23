@@ -1,5 +1,6 @@
 import numpy as np
 from PIL import  Image
+import os
 from scipy.misc import imresize
 from scipy.ndimage.interpolation import rotate
 
@@ -35,8 +36,27 @@ def cutout(image_origin, mask_size, mask_value='mean'):
     return image
 
 
-
+'''
 img = read_image('/Users/rivaille/Desktop/experiment_data/model1/train/0/li_0_20170521_190911.131.png')  # this is a PIL image
 print(img.shape)
 for i in range(9):
  save_image(cutout(img, img.shape[0] // 3), "cutout{}.png".format(i))
+'''
+
+
+namelist = []
+for filename in os.listdir(r"/Users/rivaille/Desktop/experiment_data/model1/train/0"):  # listdir的参数是文件夹的路径
+     # print (type(filename))
+     namelist.append(filename)
+#print(namelist[1])
+
+
+#循环镜像
+for i in range(len(namelist)):
+
+  img = read_image('/Users/rivaille/Desktop/experiment_data/model1/train/0/{}'.format(namelist[i]))
+  #print('C:\\Users\\Rivaille\\Desktop\\ROkinect\\data\\feng\\feng_learn\\temp\\'+namelist[i]+'')
+  if img is None:
+      continue
+  save_image(cutout(img, img.shape[0] // 3), '/Users/rivaille/Desktop/experiment_data/model1/train/0/cutout_{}'.format(namelist[i]))
+  #print('/Users/rivaille/Desktop/experiment_data/model1/train/0/{}'.format(namelist[i]))
