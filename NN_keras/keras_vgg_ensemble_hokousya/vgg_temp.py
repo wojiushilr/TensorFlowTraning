@@ -19,6 +19,11 @@ import os
 from keras.models import load_model
 
 sys.path.append('..')
+import keras.backend as K
+
+config = K.tf.ConfigProto()
+config.gpu_options.allow_growth = True
+session = K.tf.Session(config=config)
 
 #load data/labels from folder with my own rules
 def load_data(path):
@@ -34,7 +39,7 @@ def load_data(path):
     for imagePath in imagePaths:
         # load the image, pre-process it, and store it in the data list
         image = cv2.imread(imagePath)
-        image = cv2.resize(image, (224, 224))
+        image = cv2.resize(image, (96, 64))
         image = img_to_array(image)
         data.append(image)
 
@@ -54,11 +59,11 @@ def load_data(path):
 
 
 #parameter setting
-img_width, img_height = 224, 224
+img_width, img_height = 64, 96
 epochs = 15
-batch_size = 24
-train_dir = 'C:\\Users\\USER\\Desktop\\data_exp\\model1\\train'
-#test_dir = 'C:\\Users\\USER\\Desktop\\data_exp\\model1\\test'
+batch_size = 12
+train_dir = 'C:\\Users\\USER\Desktop\\data_2\\model2\\train\\'
+test_dir = 'C:\\Users\\USER\Desktop\\data_2\\model2\\test\\'
 if K.image_data_format() == 'channels_first':
     input_shape = (3,img_width,img_height)
 else:
@@ -77,31 +82,30 @@ print(y_train)
 def model_create(model_input):
 
     x = Conv2D(64, (3, 3),activation='relu',name='block1_conv1')(model_input)
-    x = Conv2D(64, (3, 3),activation='relu',name='block1_conv2')(x)
-    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
+    x = Conv2D(64, (3, 3),activation='relu',name='block1_conv2',padding="SAME")(x)
+    x = MaxPooling2D((2, 2), strides=(1, 1))(x)
     # ///////////////////////////////
-    x = Conv2D(128, (3, 3),activation='relu', name='block2_conv1')(x)
-    x = Conv2D(128, (3, 3),activation='relu', name='block2_conv2')(x)
-    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
+    x = Conv2D(128, (3, 3),activation='relu', name='block2_conv1',padding="SAME")(x)
+    x = Conv2D(128, (3, 3),activation='relu', name='block2_conv2',padding="SAME")(x)
+    x = MaxPooling2D((2, 2), strides=(1, 1))(x)
     # ///////////////////////////////
     x = Conv2D(256, (3, 3),activation='relu',name='block3_conv1')(x)
     x = Conv2D(256, (3, 3),activation='relu',name='block3_conv2')(x)
-    x = Conv2D(256, (3, 3),activation='relu',name='block3_conv3')(x)
-    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
+
+    x = MaxPooling2D((2, 2), strides=(1, 1))(x)
     # ///////////////////////////////
     x = Conv2D(512, (3, 3), activation='relu',name='block4_conv1')(x)
     x = Conv2D(512, (3, 3), activation='relu',name='block4_conv2')(x)
-    x = Conv2D(512, (3, 3), activation='relu',name='block4_conv3')(x)
-    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
+
+    x = MaxPooling2D((2, 2), strides=(1, 1))(x)
     # ///////////////////////////////
     x = Conv2D(512, (3, 3), activation='relu',name='block5_conv1')(x)
     x = Conv2D(512, (3, 3), activation='relu',name='block5_conv2')(x)
-    x = Conv2D(512, (3, 3), activation='relu',name='block5_conv3')(x)
-    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
+
+    x = MaxPooling2D((2, 2), strides=(1, 1))(x)
     # //////////////////////////////
     x = Flatten()(x)
-    x = Dense(4096,activation="relu")(x)
-    x = Dense(4096, activation="relu")(x)
+
     x = Dense(8)(x)
     x = Activation(activation='softmax')(x)
     model = Model(model_input, x, name='vgg16_1')

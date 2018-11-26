@@ -57,8 +57,8 @@ def load_data(path):
 img_width, img_height = 64, 96
 epochs = 20
 batch_size = 32
-train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model1\\train'
-test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model1\\test'
+train_dir = 'C:\\Users\\USER\Desktop\\data_2\\model1\\train\\'
+test_dir = 'C:\\Users\\USER\Desktop\\data_2\\model2_cutout\\test\\'
 if K.image_data_format() == 'channels_first':
     input_shape = (3,img_width,img_height)
 else:
@@ -102,7 +102,7 @@ def compile_and_train(model, num_epochs):
                                  save_best_only=True, mode='auto', period=1)
     tensor_board = TensorBoard(log_dir='logs1/', histogram_freq=0, batch_size=batch_size)
     history = model.fit(x=X_train, y=y_train, batch_size=batch_size,
-                        epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board],validation_split=0.2)
+                        epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board],validation_data=(X_test,y_test))
     return history
 
 
@@ -110,4 +110,4 @@ def compile_and_train(model, num_epochs):
 model1 = model_create(model_input)
 _ = compile_and_train(model1, num_epochs=epochs)
 
-model1.save('model1.h5')
+model1.save('model11.h5')

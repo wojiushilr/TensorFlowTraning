@@ -93,8 +93,8 @@ def rf(traindata,trainlabel,testdata,testlabel):
 img_width, img_height = 64, 96
 epochs = 20
 batch_size = 32
-train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data_backup\\model1\\train'
-test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data_backup\\model1\\test'
+train_dir = 'C:\\Users\\USER\Desktop\\data_2\\model1\\train\\'
+test_dir = 'C:\\Users\\USER\Desktop\\data_2\\model1\\test\\'
 
 X_train,y_train = load_data(train_dir)
 X_test,y_test = load_data(test_dir)
@@ -105,7 +105,7 @@ print(X_train.shape)
 #data reform to 2D
 data = np.append(X_train,X_test)
 print(data.shape)
-data = np.reshape(data,(8000,-1))
+data = np.reshape(data,(16000,-1))
 label = np.append(y_train,y_test)
 
 #shuffle the data
