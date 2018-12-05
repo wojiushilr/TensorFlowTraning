@@ -6,6 +6,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
+from sklearn.multiclass import OneVsRestClassifier
 from keras.preprocessing.image import img_to_array
 from keras.utils import to_categorical
 from imutils import paths
@@ -54,9 +55,11 @@ def load_data(path):
 
 def svc(traindata,trainlabel,testdata,testlabel):
     print("Start training SVM...")
-    svcClf = SVC(C=0.5,kernel="rbf",cache_size=3000)
-    svcClf.fit(traindata,trainlabel)
-    pred_testlabel = svcClf.predict(testdata)
+    estimator = SVC(C=0.5,kernel="rbf",cache_size=3000)
+    classifier = OneVsRestClassifier(estimator= estimator)
+    #svcClf = SVC(C=0.5,kernel="rbf",cache_size=3000)
+    classifier.fit(traindata,trainlabel)
+    pred_testlabel = classifier.predict(testdata)
     num = len(pred_testlabel)
     accuracy = len([1 for i in range(num) if testlabel[i]==pred_testlabel[i]])/float(num)
     print("svm Accuracy:",accuracy)
