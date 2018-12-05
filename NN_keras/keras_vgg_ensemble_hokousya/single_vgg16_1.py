@@ -17,8 +17,17 @@ import cv2
 import sys
 import os
 from keras.models import load_model
+from keras.backend import tensorflow_backend
+import tensorflow as tf
 
-sys.path.append('..')
+config = tf.ConfigProto(
+      gpu_options=tf.GPUOptions(
+          per_process_gpu_memory_fraction=0.8, # 最大値の80%まで
+          allow_growth=True # True->必要になったら確保, False->全部
+      )
+    )
+sess = sess = tf.Session(config=config)
+tensorflow_backend.set_session(sess)
 
 #load data/labels from folder with my own rules
 def load_data(path):
@@ -57,8 +66,8 @@ def load_data(path):
 img_width, img_height = 64, 96
 epochs = 20
 batch_size = 32
-train_dir = '/Users/rivaille/Desktop/experiment_data/model1/train'
-test_dir = '/Users/rivaille/Desktop/experiment_data/model1/test'
+train_dir = 'C:\\Users\\USER\Desktop\\data_2\\model1\\train\\'
+test_dir = 'C:\\Users\\USER\Desktop\\data_2\\model1\\test\\'
 if K.image_data_format() == 'channels_first':
     input_shape = (3,img_width,img_height)
 else:
@@ -96,19 +105,6 @@ def model_create(model_input):
                name='block2_conv2')(x)
 
 
-    # ///////////////////////////////
-    x = Conv2D(256, (3, 3),
-               activation='relu',
-
-               name='block3_conv1')(x)
-    x = Conv2D(256, (3, 3),
-               activation='relu',
-
-               name='block3_conv2')(x)
-    x = Conv2D(256, (3, 3),
-               activation='relu',
-
-               name='block3_conv3')(x)
 
 
     # ///////////////////////////////
@@ -124,7 +120,7 @@ def model_create(model_input):
                activation='relu',
 
                name='block4_conv3')(x)
-    x = MaxPooling2D((2, 2), strides=2)(x)
+    x = MaxPooling2D((2, 2), strides=1)(x)
     # ///////////////////////////////
     x = Conv2D(512, (3, 3),
                activation='relu',
@@ -138,7 +134,7 @@ def model_create(model_input):
                activation='relu',
 
                name='block5_conv3')(x)
-    x = MaxPooling2D((2, 2), strides=2)(x)
+    x = MaxPooling2D((2, 2), strides=1)(x)
 
     # ///////////////////////////////
     x = Flatten()(x)
