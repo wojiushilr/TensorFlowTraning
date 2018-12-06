@@ -52,8 +52,7 @@ def load_data(path):
     return data,labels
 
 
-
-def svc(traindata,trainlabel,testdata,testlabel):
+'''def svc(traindata,trainlabel,testdata,testlabel):
     print("Start training SVM...")
     estimator = SVC(C=0.5,kernel="rbf",cache_size=3000)
     classifier = OneVsRestClassifier(estimator= estimator)
@@ -64,7 +63,8 @@ def svc(traindata,trainlabel,testdata,testlabel):
     accuracy = len([1 for i in range(num) if testlabel[i]==pred_testlabel[i]])/float(num)
     print("svm Accuracy:",accuracy)
     print(testlabel[100:110])
-    print(pred_testlabel[100:110])
+    print(pred_testlabel[100:110])'''
+
 
 def ada(traindata,trainlabel,testdata,testlabel):
     print("Start training Adaboost...")
@@ -80,8 +80,8 @@ def ada(traindata,trainlabel,testdata,testlabel):
     print(pred_testlabel[100:110])
 
 def rf(traindata,trainlabel,testdata,testlabel):
-    randomf = RandomForestClassifier(n_estimators= 60, max_depth=13, min_samples_split=120,
-                                  min_samples_leaf=20,max_features=7 ,oob_score=True, random_state=10)
+    randomf = RandomForestClassifier(num_trees = 60, max_depth=13, min_samples_split=120,
+                                  min_samples_leaf=20,max_features=7 ,oob_score=True, random_state=10,verbose=3)
     randomf.fit(traindata, trainlabel)
     pred_testlabel = randomf.predict(testdata)
     num = len(pred_testlabel)
@@ -125,6 +125,6 @@ print(label[780:790])
 x_train, x_test, y_train, y_test = train_test_split(data, label, test_size=0.25,random_state=0)
 
 #start training
-svc(x_train, y_train, x_test, y_test)
+#svc(x_train, y_train, x_test, y_test)
 ada(x_train, y_train, x_test, y_test)
 rf(x_train, y_train, x_test, y_test)

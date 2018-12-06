@@ -95,8 +95,8 @@ def PlotGridSearchScores(model_tuning, x_param, line_param):
 
 
 #parameter setting
-train_dir = '/Users/rivaille/Desktop/experiment_data/model5/train'
-test_dir = '/Users/rivaille/Desktop/experiment_data/model5/test'
+train_dir = 'C:\\Users\\USER\\Desktop\\data_2\\model2\\train'
+test_dir = 'C:\\Users\\USER\\Desktop\\data_2\\model2\\test'
 
 X_train,y_train = load_data(train_dir)
 X_test,y_test = load_data(test_dir)
@@ -139,20 +139,20 @@ print(y_test[100:110])
 print(pred_testlabel[100:110])
 '''
 
-model = OneVsRestClassifier(SVC())
+model = RandomForestClassifier()
 
-C_params = np.logspace(-4, 4, 5)
-gamma_params = np.logspace(-4, 4, 5)
-
+C_params = [1,10,100]
+#gamma_params = [0.01,0.001,0.0001,0.00001]
+max_depth = [13,14,15,16,17,18]
 parameters = {
-    'estimator__C': C_params,
-    'estimator__gamma': gamma_params
+    'n_estimators': C_params,
+    'max_depth': max_depth
+
 }
 
 model_tuning = GridSearchCV(
     estimator=model,
     param_grid=parameters,
-    n_jobs=-1,
     verbose=3
 )
 
@@ -160,15 +160,15 @@ model_tuning.fit(x_train, y_train)
 
 
 # チューニング結果を描画
-PlotGridSearchScores(model_tuning, 'estimator__gamma', 'estimator__C')
+PlotGridSearchScores(model_tuning, 'n_estimators', 'max_depth')
 
 
 # Best parameter
-model_tuning.best_params_
-
+print('best:',model_tuning.best_params_)
 # 評価データでconfusion matrixとaccuracy scoreを算出
 classifier_tuned = model_tuning.best_estimator_
-pred = classifier_tuned.predict(X_test)
+pred = classifier_tuned.predict(x_test)
 
 accuracy = accuracy_score(y_test, pred)
-print('Multiclass SVM(default): %.3f' % accuracy)
+print('Multiclass (default): %.3f' % accuracy)
+plt.show()
