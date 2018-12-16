@@ -50,25 +50,24 @@ def load_data(path):
     # convert the labels from integers to vectors
     #labels = to_categorical(labels, num_classes=8)
     return data,labels
-
-
-'''def svc(traindata,trainlabel,testdata,testlabel):
+'''
+def svc(traindata,trainlabel,testdata,testlabel):
     print("Start training SVM...")
-    estimator = SVC(C=0.5,kernel="rbf",cache_size=3000)
-    classifier = OneVsRestClassifier(estimator= estimator)
+    estimator = SVC(C=1,kernel="rbf",gamma= 0.01,verbose=True)
+    #classifier = OneVsRestClassifier(estimator= estimator)
     #svcClf = SVC(C=0.5,kernel="rbf",cache_size=3000)
-    classifier.fit(traindata,trainlabel)
-    pred_testlabel = classifier.predict(testdata)
+    estimator.fit(traindata,trainlabel)
+    pred_testlabel = estimator.predict(testdata)
     num = len(pred_testlabel)
     accuracy = len([1 for i in range(num) if testlabel[i]==pred_testlabel[i]])/float(num)
     print("svm Accuracy:",accuracy)
     print(testlabel[100:110])
-    print(pred_testlabel[100:110])'''
-
+    print(pred_testlabel[100:110])
+'''
 
 def ada(traindata,trainlabel,testdata,testlabel):
     print("Start training Adaboost...")
-    bdt_real = AdaBoostClassifier(DecisionTreeClassifier(max_depth=2, min_samples_split=20, min_samples_leaf=5),
+    bdt_real = AdaBoostClassifier(DecisionTreeClassifier(max_depth=17, min_samples_split=20, min_samples_leaf=5),
                          algorithm="SAMME",
                          n_estimators=5, learning_rate=0.8)
     bdt_real.fit(traindata, trainlabel)
@@ -80,8 +79,7 @@ def ada(traindata,trainlabel,testdata,testlabel):
     print(pred_testlabel[100:110])
 
 def rf(traindata,trainlabel,testdata,testlabel):
-    randomf = RandomForestClassifier(num_trees = 60, max_depth=13, min_samples_split=120,
-                                  min_samples_leaf=20,max_features=7 ,oob_score=True, random_state=10,verbose=3)
+    randomf = RandomForestClassifier(n_estimators = 100, max_depth=17, verbose=3)
     randomf.fit(traindata, trainlabel)
     pred_testlabel = randomf.predict(testdata)
     num = len(pred_testlabel)
@@ -96,7 +94,7 @@ def rf(traindata,trainlabel,testdata,testlabel):
 img_width, img_height = 64, 96
 epochs = 20
 batch_size = 32
-train_dir = 'C:\\Users\\USER\Desktop\\data_2\\model1\\train\\'
+train_dir = 'C:\\Users\\USER\Desktop\\data_2\\model2\\train\\'
 test_dir = 'C:\\Users\\USER\Desktop\\data_2\\model1\\test\\'
 
 X_train,y_train = load_data(train_dir)
@@ -108,7 +106,7 @@ print(X_train.shape)
 #data reform to 2D
 data = np.append(X_train,X_test)
 print(data.shape)
-data = np.reshape(data,(16000,-1))
+data = np.reshape(data,(9600,-1))
 label = np.append(y_train,y_test)
 
 #shuffle the data

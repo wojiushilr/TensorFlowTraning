@@ -105,7 +105,16 @@ def compile_and_train(model, num_epochs):
                         epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board],validation_data=(X_test,y_test))
     return history
 
+def evaluate_error(model):
 
+    pred = model.predict(X_test, batch_size = batch_size)
+    pred = np.argmax(pred, axis=1)
+    print(pred.shape)
+    #pred = np.expand_dims(pred, axis=1) # make same shape as y_test
+    #pred = to_categorical(pred, num_classes=10)
+    print(y_test.shape[0])
+    error = np.sum(np.not_equal(pred, y_test)) / y_test.shape[0]
+    return error
 
 model1 = model_create(model_input)
 _ = compile_and_train(model1, num_epochs=epochs)

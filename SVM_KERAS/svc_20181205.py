@@ -96,7 +96,7 @@ def PlotGridSearchScores(model_tuning, x_param, line_param):
 
 #parameter setting
 train_dir = 'C:\\Users\\USER\\Desktop\\data_2\\model2\\train'
-test_dir = 'C:\\Users\\USER\\Desktop\\data_2\\model2\\test'
+test_dir = 'C:\\Users\\USER\\Desktop\\data_2\\model1\\test'
 
 X_train,y_train = load_data(train_dir)
 X_test,y_test = load_data(test_dir)
@@ -107,7 +107,7 @@ print(X_train.shape)
 #data reform to 2D
 data = np.append(X_train,X_test)
 print(data.shape)
-data = np.reshape(data,(8000,-1))
+data = np.reshape(data,(9600,-1))
 label = np.append(y_train,y_test)
 
 #shuffle the data
@@ -141,19 +141,21 @@ print(pred_testlabel[100:110])
 
 model = RandomForestClassifier()
 
-C_params = [1,10,100]
+C_params = [1,10,100,1000,2000]
 #gamma_params = [0.01,0.001,0.0001,0.00001]
-max_depth = [13,14,15,16,17,18]
+max_depth = [16,17,18,19,20]
 parameters = {
     'n_estimators': C_params,
     'max_depth': max_depth
 
 }
 
+score = "f1"
 model_tuning = GridSearchCV(
     estimator=model,
     param_grid=parameters,
-    verbose=3
+    verbose=3,
+    scoring = "%s_weighted" % score
 )
 
 model_tuning.fit(x_train, y_train)
