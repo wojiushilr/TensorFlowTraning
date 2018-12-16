@@ -55,16 +55,16 @@ def load_data(path):
 img_width, img_height = 64, 96
 epochs = 20
 batch_size = 32
-train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model5\\train'
-test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model5\\test'
+train_dir5 = 'C:\\Users\\USER\\Desktop\\data_2\\model5\\train\\'
+test_dir5 = 'C:\\Users\\USER\\Desktop\\data_2\\model1\\test\\'
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
 else:
     input_shape = (img_width, img_height, 3)
 
 #data_reading
-X_train,y_train = load_data(train_dir)
-X_test,y_test = load_data(test_dir)
+X_train,y_train = load_data(train_dir5)
+X_test,y_test = load_data(test_dir5)
 #y_test = np.argmax(y_test , axis=1)
 model_input = Input(shape=input_shape)
 print(X_train.shape)
@@ -73,16 +73,16 @@ print(X_train.shape)
 def model_create(model_input):
     x = Conv2D(32, (3, 3), activation='relu')(model_input)
     x = Conv2D(32, (3, 3), activation='relu')(x)
-    x = Conv2D(32, (3, 3), activation='relu')(x)
     x = MaxPooling2D((2, 2))(x)
 
     x = Conv2D(64, (3, 3), activation='relu')(x)
     x = Conv2D(64, (1, 1), activation='relu')(x)
     x = MaxPooling2D((2, 2))(x)
 
-    x = Conv2D(128, (3, 3), activation='relu')(x)
-    x = Conv2D(32, (1, 1), activation='relu')(x)
+
     x = Flatten()(x)
+    x = Dense(4096,activation="relu")(x)
+    x = Dense(4096,activation="relu")(x)
     x = Dense(8)(x)
     x = Activation(activation='softmax')(x)
     model = Model(model_input, x, name='nin_cnn5')
@@ -96,12 +96,23 @@ def compile_and_train(model, num_epochs):
                                  save_best_only=True, mode='auto', period=1)
     tensor_board = TensorBoard(log_dir='logs5/', histogram_freq=0, batch_size=batch_size)
     history = model.fit(x=X_train, y=y_train, batch_size=batch_size,
-                        epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board], validation_data=(X_test,y_test))
+                        epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board], validation_split=0.2)
     return history
 
+def evaluate_error(model):
 
+    pred = model.predict(X_test, batch_size = batch_size)
+    pred = np.argmax(pred, axis=1)
+    print(pred.shape)
+    #pred = np.expand_dims(pred, axis=1) # make same shape as y_test
+    pred = to_categorical(pred, num_classes=8)
+    print(y_test.shape[0])
+    error = np.sum(np.not_equal(pred, y_test)) / y_test.shape[0]
+    return error
 
 model5 = model_create(model_input)
 _ = compile_and_train(model5, num_epochs=epochs)
-
-model5.save('model5.h5')
+err = evaluate_error(model5)
+print('error',err)
+print('acc',1-err)
+model5.save('model55.h5')

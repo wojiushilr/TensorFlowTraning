@@ -55,16 +55,16 @@ def load_data(path):
 img_width, img_height = 64, 96
 epochs = 20
 batch_size = 32
-train_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model4\\train'
-test_dir = 'C:\\Users\\USER\\Desktop\\experiment_data\\model4\\test'
+train_dir4 = 'C:\\Users\\USER\\Desktop\\data_2\\model4\\train\\'
+test_dir4 = 'C:\\Users\\USER\\Desktop\\data_2\\model1\\test\\'
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
 else:
     input_shape = (img_width, img_height, 3)
 
 #data_reading
-X_train,y_train = load_data(train_dir)
-X_test,y_test = load_data(test_dir)
+X_train,y_train = load_data(train_dir4)
+X_test,y_test = load_data(test_dir4)
 #y_test = np.argmax(y_test , axis=1)
 model_input = Input(shape=input_shape)
 print(X_train.shape)
@@ -96,13 +96,24 @@ def compile_and_train(model, num_epochs):
                                  save_best_only=True, mode='auto', period=1)
     tensor_board = TensorBoard(log_dir='logs4/', histogram_freq=0, batch_size=batch_size)
     history = model.fit(x=X_train, y=y_train, batch_size=batch_size,
-                        epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board], validation_data=(X_test,y_test))
+                        epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board], validation_split=0.2)
     return history
+def evaluate_error(model):
 
+    pred = model.predict(X_test, batch_size = batch_size)
+    pred = np.argmax(pred, axis=1)
+    print(pred.shape)
+    #pred = np.expand_dims(pred, axis=1) # make same shape as y_test
+    pred = to_categorical(pred, num_classes=8)
+    print(y_test.shape[0])
+    error = np.sum(np.not_equal(pred, y_test)) / y_test.shape[0]
+    return error
 
 
 
 model4 = model_create(model_input)
 _ = compile_and_train(model4, num_epochs=epochs)
-
-model4.save('model4.h5')
+err = evaluate_error(model4)
+print('error',err)
+print('acc',1-err)
+model4.save('model44.h5')

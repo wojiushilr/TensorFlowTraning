@@ -78,34 +78,35 @@ print(X_train.shape)
 print(y_train)
 
 
-#model_1
+#model_1 VGG-11
 def model_create(model_input):
 
     x = Conv2D(64, (3, 3),activation='relu',name='block1_conv1')(model_input)
     x = Conv2D(64, (3, 3),activation='relu',name='block1_conv2',padding="SAME")(x)
-    x = MaxPooling2D((2, 2), strides=(1, 1))(x)
+    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
     # ///////////////////////////////
     x = Conv2D(128, (3, 3),activation='relu', name='block2_conv1',padding="SAME")(x)
     x = Conv2D(128, (3, 3),activation='relu', name='block2_conv2',padding="SAME")(x)
-    x = MaxPooling2D((2, 2), strides=(1, 1))(x)
+    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
     # ///////////////////////////////
-    x = Conv2D(256, (3, 3),activation='relu',name='block3_conv1')(x)
-    x = Conv2D(256, (3, 3),activation='relu',name='block3_conv2')(x)
+    x = Conv2D(256, (3, 3),activation='relu',name='block3_conv1',padding="SAME")(x)
+    x = Conv2D(256, (3, 3),activation='relu',name='block3_conv2',padding="SAME")(x)
 
-    x = MaxPooling2D((2, 2), strides=(1, 1))(x)
+    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
     # ///////////////////////////////
-    x = Conv2D(512, (3, 3), activation='relu',name='block4_conv1')(x)
-    x = Conv2D(512, (3, 3), activation='relu',name='block4_conv2')(x)
+    x = Conv2D(512, (3, 3), activation='relu',name='block4_conv1',padding="SAME")(x)
+    x = Conv2D(512, (3, 3), activation='relu',name='block4_conv2',padding="SAME")(x)
 
-    x = MaxPooling2D((2, 2), strides=(1, 1))(x)
+    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
     # ///////////////////////////////
-    x = Conv2D(512, (3, 3), activation='relu',name='block5_conv1')(x)
-    x = Conv2D(512, (3, 3), activation='relu',name='block5_conv2')(x)
+    x = Conv2D(512, (3, 3), activation='relu',name='block5_conv1',padding="SAME")(x)
+    x = Conv2D(512, (3, 3), activation='relu',name='block5_conv2',padding="SAME")(x)
 
-    x = MaxPooling2D((2, 2), strides=(1, 1))(x)
+    x = MaxPooling2D((2, 2), strides=(2, 2))(x)
     # //////////////////////////////
     x = Flatten()(x)
-
+    x = Dense(512,activation="relu")(x)
+    x = Dense(512,activation="relu")(x)
     x = Dense(8)(x)
     x = Activation(activation='softmax')(x)
     model = Model(model_input, x, name='vgg16_1')
@@ -114,7 +115,7 @@ def model_create(model_input):
 
 def compile_and_train(model, num_epochs):
 
-    model.compile(loss=categorical_crossentropy, optimizer=Adam(lr=1e-4), metrics=['acc'])
+    model.compile(loss=categorical_crossentropy, optimizer=Adam(lr=1e-5), metrics=['acc'])
     filepath = 'weights/' + model.name + '.{epoch:02d}-{loss:.2f}.hdf5'
     checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=0, save_weights_only=True,
                                  save_best_only=True, mode='auto', period=1)

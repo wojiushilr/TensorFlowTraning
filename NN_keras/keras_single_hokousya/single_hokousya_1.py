@@ -79,14 +79,13 @@ def model_create(model_input):
     x = Conv2D(32, (3, 3), padding='same',activation='relu')(x)
     x = MaxPooling2D((2, 2), strides=2)(x)
     x = Conv2D(64, (3, 3), padding='same',activation='relu')(x)
-    x = Conv2D(64, (3, 3), padding='same',activation='relu')(x)
-    x = Conv2D(64, (1, 1), padding='same',activation='relu')(x)
+    #x = Conv2D(64, (3, 3), padding='same',activation='relu')(x)
+    #x = Conv2D(64, (1, 1), padding='same',activation='relu')(x)
     x = MaxPooling2D((2, 2), strides=2)(x)
-    x = Conv2D(128, (3, 3),padding='same', activation='relu')(x)
-    x = Conv2D(64, (3, 3),padding='same', activation='relu')(x)
+    #x = Conv2D(128, (3, 3),padding='same', activation='relu')(x)
+    #x = Conv2D(64, (3, 3),padding='same', activation='relu')(x)
     x = Conv2D(32, (1, 1),padding='same', activation='relu')(x)
     x = Flatten()(x)
-
     x = Dense(8)(x)
     x = Activation(activation='softmax')(x)
     model = Model(model_input, x, name='nin_cnn1')
@@ -102,7 +101,7 @@ def compile_and_train(model, num_epochs):
                                  save_best_only=True, mode='auto', period=1)
     tensor_board = TensorBoard(log_dir='logs1/', histogram_freq=0, batch_size=batch_size)
     history = model.fit(x=X_train, y=y_train, batch_size=batch_size,
-                        epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board],validation_data=(X_test,y_test))
+                        epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board],validation_split=0.2)
     return history
 
 def evaluate_error(model):
@@ -111,12 +110,14 @@ def evaluate_error(model):
     pred = np.argmax(pred, axis=1)
     print(pred.shape)
     #pred = np.expand_dims(pred, axis=1) # make same shape as y_test
-    #pred = to_categorical(pred, num_classes=10)
+    pred = to_categorical(pred, num_classes=8)
     print(y_test.shape[0])
     error = np.sum(np.not_equal(pred, y_test)) / y_test.shape[0]
     return error
 
 model1 = model_create(model_input)
 _ = compile_and_train(model1, num_epochs=epochs)
-
+err = evaluate_error(model1)
+print('error',err)
+print('acc',1-err)
 model1.save('model11.h5')
