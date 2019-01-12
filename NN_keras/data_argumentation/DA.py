@@ -36,14 +36,14 @@ def cutout(image_origin, mask_size, mask_value='mean'):
     return image
 
 
-'''
-img = read_image('/Users/rivaille/Desktop/experiment_data/model1/train/0/li_0_20170521_190911.131.png')  # this is a PIL image
+
+img = read_image('C:\\Users\\USER\Desktop\\data_2\\model2\\train\\0\\li_0_20170421_190911.171.png')  # this is a PIL image
 print(img.shape)
-for i in range(9):
+for i in range(1):
  save_image(cutout(img, img.shape[0] // 3), "cutout{}.png".format(i))
+
+
 '''
-
-
 namelist = []
 for filename in os.listdir(r"C:\\Users\\USER\Desktop\\data_2\\model2\\train\\7"):  # listdir的参数是文件夹的路径
      # print (type(filename))
@@ -60,3 +60,4 @@ for i in range(len(namelist)):
       continue
   save_image(cutout(img, img.shape[0] // 3), 'C:\\Users\\USER\Desktop\\data_2\\model2_cutout\\train\\7\\cutout_{}'.format(namelist[i]))
   #print('/Users/rivaille/Desktop/experiment_data/model1/train/0/{}'.format(namelist[i]))
+'''

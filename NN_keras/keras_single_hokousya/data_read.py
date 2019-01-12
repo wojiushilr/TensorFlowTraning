@@ -123,4 +123,4 @@ model1.fit_generator(
     validation_data=validation_generator,
     validation_steps=nb_validation_samples // batch_size)
 
-model1.save_weights('/Users/rivaille/PycharmProjects/TensorFlowTraning/NN_keras/keras_single_hokousya/weights/model1.h5')
+model1.save_weights('/Users/rivaille/PycharmProjects/TensorFlowTraning/NN_keras/keras_single_hokousya/weights/model2.h5')

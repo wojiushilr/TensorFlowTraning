@@ -72,8 +72,10 @@ model_input = Input(shape=input_shape)
 
 #data_reading
 X_train,y_train = load_data(train_dir)
+X_test,y_test0 = load_data(test_dir)
 
-#X_test,y_test = load_data(test_dir)
+y_test = np.argmax(y_test0 , axis=1)
+#y_test = np.argmax(y_test , axis=1)
 print(X_train.shape)
 print(y_train)
 
@@ -124,9 +126,25 @@ def compile_and_train(model, num_epochs):
                         epochs=num_epochs, verbose=1, callbacks=[checkpoint, tensor_board],validation_split=0.2)
     return history
 
+def evaluate_error(model):
+
+    pred = model.predict(X_test, batch_size = batch_size)
+    pred = np.argmax(pred, axis=1)
+    print(pred.shape)
+    #pred = np.expand_dims(pred, axis=1) # make same shape as y_test
+    #pred = to_categorical(pred, num_classes=10)
+    print(y_test.shape[0])
+    error = np.sum(np.not_equal(pred, y_test)) / y_test.shape[0]
+    return error
 
 
 model1 = model_create(model_input)
 _ = compile_and_train(model1, num_epochs=epochs)
 
-model1.save('vgg16_model1.h5')
+err = evaluate_error(model1)
+print('error',err)
+print('acc',1-err)
+loss,acc = model1.evaluate(X_test,y_test0)
+print('loss,acccccc',loss,acc)
+
+model1.save('vgg16_model2.h5')

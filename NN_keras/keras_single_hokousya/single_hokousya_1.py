@@ -57,7 +57,8 @@ def load_data(path):
 img_width, img_height = 64, 96
 epochs = 20
 batch_size = 32
-train_dir = 'C:\\Users\\USER\Desktop\\data_2\\model2_cutout\\train\\'
+train_dir = 'C:\\Users\\USER\Desktop\\data_2\\model1\\train\\'
+valida_dir = 'C:\\Users\\USER\Desktop\\data_1\\model1\\test\\'
 test_dir = 'C:\\Users\\USER\Desktop\\data_2\\model1\\test\\'
 if K.image_data_format() == 'channels_first':
     input_shape = (3,img_width,img_height)
@@ -67,8 +68,9 @@ model_input = Input(shape=input_shape)
 
 #data_reading
 X_train,y_train = load_data(train_dir)
-X_test,y_test = load_data(test_dir)
-print(X_train.shape)
+X_val,y_val =load_data(valida_dir)
+X_test,y_test0 = load_data(test_dir)
+y_test = np.argmax(y_test0 , axis=1)
 #print(X_train)
 
 
@@ -77,14 +79,14 @@ def model_create(model_input):
 
     x = Conv2D(32, (3, 3), padding='same',activation='relu')(model_input)
     x = Conv2D(32, (3, 3), padding='same',activation='relu')(x)
-    x = MaxPooling2D((2, 2), strides=2)(x)
-    x = Conv2D(64, (3, 3), padding='same',activation='relu')(x)
-    #x = Conv2D(64, (3, 3), padding='same',activation='relu')(x)
-    #x = Conv2D(64, (1, 1), padding='same',activation='relu')(x)
-    x = MaxPooling2D((2, 2), strides=2)(x)
-    #x = Conv2D(128, (3, 3),padding='same', activation='relu')(x)
-    #x = Conv2D(64, (3, 3),padding='same', activation='relu')(x)
     x = Conv2D(32, (1, 1),padding='same', activation='relu')(x)
+    x = MaxPooling2D((2, 2), strides=2)(x)
+    #x = Conv2D(64, (3, 3), padding='same',activation='relu')(x)
+    x = Conv2D(64, (3, 3), padding='same',activation='relu')(x)
+    x = Conv2D(64, (3, 3), padding='same',activation='relu')(x)
+    x = Conv2D(64, (3, 3),padding='same', activation='relu')(x)
+    x = MaxPooling2D((2, 2), strides=2)(x)
+    x = Conv2D(128, (3, 3),padding='same', activation='relu')(x)
     x = Flatten()(x)
     x = Dense(8)(x)
     x = Activation(activation='softmax')(x)
@@ -95,7 +97,7 @@ def model_create(model_input):
 
 def compile_and_train(model, num_epochs):
 
-    model.compile(loss=categorical_crossentropy, optimizer=Adam(lr=1e-4), metrics=['acc'])
+    model.compile(loss=categorical_crossentropy, optimizer=Adam(), metrics=['acc'])
     filepath = 'weights/' + model.name + '.{epoch:02d}-{loss:.2f}.hdf5'
     checkpoint = ModelCheckpoint(filepath, monitor='loss', verbose=0, save_weights_only=True,
                                  save_best_only=True, mode='auto', period=1)
@@ -110,14 +112,19 @@ def evaluate_error(model):
     pred = np.argmax(pred, axis=1)
     print(pred.shape)
     #pred = np.expand_dims(pred, axis=1) # make same shape as y_test
-    pred = to_categorical(pred, num_classes=8)
+    #pred = to_categorical(pred, num_classes=10)
     print(y_test.shape[0])
     error = np.sum(np.not_equal(pred, y_test)) / y_test.shape[0]
     return error
+
 
 model1 = model_create(model_input)
 _ = compile_and_train(model1, num_epochs=epochs)
 err = evaluate_error(model1)
 print('error',err)
 print('acc',1-err)
-model1.save('model11.h5')
+
+loss,acc = model1.evaluate(X_test,y_test0)
+print('loss,acccccc',loss,acc)
+model1.save('model11_1.h5')
+

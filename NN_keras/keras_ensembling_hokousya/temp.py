@@ -75,7 +75,7 @@ print(X_train.shape)
 
 #ensemble model
 
-model1 = load_model('model1.h5')
+model1 = load_model('model2.h5')
 models=[model1,model1]
 
 def ensemble(models, model_input):

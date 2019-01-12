@@ -146,5 +146,5 @@ scoreSeg = model1.evaluate_generator(validation_generator,nb_train_samples // ba
 print("Accuracy = ",scoreSeg[1])
 
 
-#model1.save_weights('/Users/rivaille/PycharmProjects/TensorFlowTraning/NN_keras/keras_single_hokousya/weights/model1.h5')
+#model1.save_weights('/Users/rivaille/PycharmProjects/TensorFlowTraning/NN_keras/keras_single_hokousya/weights/model2.h5')
 

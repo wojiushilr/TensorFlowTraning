@@ -55,16 +55,17 @@ def load_data(path):
 img_width, img_height = 64, 96
 epochs = 20
 batch_size = 32
-train_dir2 = 'C:\\Users\\USER\\Desktop\\data_1\\model1\\train\\'
-test_dir2 = 'C:\\Users\\USER\\Desktop\\data_2\\model1\\test\\'
+train_dir = 'C:\\Users\\USER\\Desktop\\data_2\\model2\\train\\'
+test_dir = 'C:\\Users\\USER\\Desktop\\data_2\\model2_cutout\\test\\'
 if K.image_data_format() == 'channels_first':
     input_shape = (3, img_width, img_height)
 else:
     input_shape = (img_width, img_height, 3)
 
 #data_reading
-X_train,y_train = load_data(train_dir2)
-X_test,y_test = load_data(test_dir2)
+X_train,y_train = load_data(train_dir)
+X_test,y_test0 = load_data(test_dir)
+y_test = np.argmax(y_test0 , axis=1)
 #y_test = np.argmax(y_test , axis=1)
 model_input = Input(shape=input_shape)
 
@@ -74,17 +75,21 @@ model_input = Input(shape=input_shape)
 def model_create(model_input):
 
 
-    x = Conv2D(32, (3, 3), activation='relu')(model_input)
-    x = Conv2D(32, (3, 3), activation='relu')(x)
-
+    x = Conv2D(32, (3, 3), padding='same',activation='relu')(model_input)
+    x = Conv2D(32, (3, 3), padding='same',activation='relu')(x)
     x = MaxPooling2D((2, 2), strides=2)(x)
-
-    x = Conv2D(64, (3, 3), activation='relu')(x)
-    x = Conv2D(64, (1, 1), activation='relu')(x)
+    x = Conv2D(64, (3, 3), padding='same',activation='relu')(x)
+    x = Conv2D(64, (3, 3), padding='same',activation='relu')(x)
     x = MaxPooling2D((2, 2), strides=2)(x)
-
-
+    x = Conv2D(128, (3, 3), padding='same',activation='relu')(x)
+    x = Conv2D(128, (3, 3), padding='same',activation='relu')(x)
+    x = MaxPooling2D((2, 2), strides=2)(x)
+    x = Conv2D(256, (3, 3), padding='same',activation='relu')(x)
+    x = Conv2D(256, (3, 3), padding='same',activation='relu')(x)
+    x = MaxPooling2D((2, 2), strides=2)(x)
     x = Flatten()(x)
+    x = Dense(256,activation="relu")(x)
+    x = Dense(256,activation="relu")(x)
     x = Dense(8)(x)
     x = Activation(activation='softmax')(x)
     model = Model(model_input, x, name='nin_cnn2')
@@ -108,7 +113,7 @@ def evaluate_error(model):
     pred = np.argmax(pred, axis=1)
     print(pred.shape)
     #pred = np.expand_dims(pred, axis=1) # make same shape as y_test
-    pred = to_categorical(pred, num_classes=8)
+    #pred = to_categorical(pred, num_classes=10)
     print(y_test.shape[0])
     error = np.sum(np.not_equal(pred, y_test)) / y_test.shape[0]
     return error
@@ -120,4 +125,6 @@ _ = compile_and_train(model2, num_epochs=epochs)
 err = evaluate_error(model2)
 print('error',err)
 print('acc',1-err)
+loss,acc = model2.evaluate(X_test,y_test0)
+print('loss,acccccc',loss,acc)
 model2.save('model22.h5')
